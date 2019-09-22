@@ -2,7 +2,8 @@
 /*	$NetBSD: rdate.c,v 1.4 1996/03/16 12:37:45 pk Exp $	*/
 
 /*
- * Copyright (c) 1994 Christos Zoulas
+ * Copyright 1994 Christos Zoulas
+ * Copyright 2007 Joey Hess <joeyh@debian.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -69,7 +70,7 @@ static const char rcsid[] = "$OpenBSD: rfc868time.c,v 1.6 2004/02/16 21:25:41 ja
 
 void
 rfc868time_client (const char *hostname, int family, struct timeval *new,
-    struct timeval *adjust, int leapflag)
+    struct timeval *adjust, int leapflag, int useudp, int port)
 {
 	struct addrinfo hints, *res0, *res;
 	struct timeval old;
@@ -80,10 +81,10 @@ rfc868time_client (const char *hostname, int family, struct timeval *new,
 
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = family;
-	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_socktype = useudp ? SOCK_DGRAM : SOCK_STREAM;
 	/* XXX what about rfc868 UDP
 	 * probably not due to the Y2038 issue  -mirabile */
-	error = getaddrinfo(hostname, "time", &hints, &res0);
+	error = getaddrinfo(hostname, port ? NULL : "time", &hints, &res0);
 	if (error) {
 		errx(1, "%s: %s", hostname, gai_strerror(error));
 		/*NOTREACHED*/
@@ -94,6 +95,10 @@ rfc868time_client (const char *hostname, int family, struct timeval *new,
 		s = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 		if (s < 0)
 			continue;
+
+		if (port) {
+			((struct sockaddr_in*)res->ai_addr)->sin_port = htons(port);
+		}
 
 		if (connect(s, res->ai_addr, res->ai_addrlen) < 0) {
 			close(s);
@@ -106,6 +111,10 @@ rfc868time_client (const char *hostname, int family, struct timeval *new,
 	if (s < 0)
 		err(1, "Could not connect socket");
 	freeaddrinfo(res0);
+
+	/* UDP requires us to send an empty datagram first */
+	if (useudp)
+		send(s, NULL, 0, 0);
 
 	if (read(s, &tim, sizeof(tim)) != sizeof(tim))
 		err(1, "Could not read data");

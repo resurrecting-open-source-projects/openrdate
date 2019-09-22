@@ -2,7 +2,8 @@
 /*	$NetBSD: rdate.c,v 1.4 1996/03/16 12:37:45 pk Exp $	*/
 
 /*
- * Copyright (c) 1994 Christos Zoulas
+ * Copyright 1994 Christos Zoulas
+ * Copyright 2007 Joey Hess <joeyh@debian.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -55,6 +56,7 @@ static const char rcsid[] = "$OpenBSD: rdate.c,v 1.22 2004/02/18 20:10:53 jmc Ex
 #include <sys/time.h>
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <ctype.h>
 #include <err.h>
 #include <string.h>
@@ -68,22 +70,24 @@ static const char rcsid[] = "$OpenBSD: rdate.c,v 1.22 2004/02/18 20:10:53 jmc Ex
 #define logwtmp(a,b,c)
 #endif
 
-void rfc868time_client (const char *, int, struct timeval *, struct timeval *, int);
-void ntp_client (const char *, int, struct timeval *, struct timeval *, int);
+void rfc868time_client (const char *, int, struct timeval *, struct timeval *, int, int, int);
+void ntp_client (const char *, int, struct timeval *, struct timeval *, int, int);
 
 extern char    *__progname;
 
 void
 usage(void)
 {
-	(void) fprintf(stderr, "Usage: %s [-46acnpsv] host\n", __progname);
+	(void) fprintf(stderr, "Usage: %s [-46acnpsv] [-o port] host\n", __progname);
 	(void) fprintf(stderr, "  -4: use IPv4 only\n");
 	(void) fprintf(stderr, "  -6: use IPv6 only\n");
 	(void) fprintf(stderr, "  -a: use adjtime instead of instant change\n");
 	(void) fprintf(stderr, "  -c: correct leap second count\n");
 	(void) fprintf(stderr, "  -n: use SNTP instead of RFC868 time protocol\n");
+	(void) fprintf(stderr, "  -o num: override time port with num\n");
 	(void) fprintf(stderr, "  -p: just print, don't set\n");
 	(void) fprintf(stderr, "  -s: just set, don't print\n");
+	(void) fprintf(stderr, "  -u: use UDP instead of TCP as transport\n");
 	(void) fprintf(stderr, "  -v: verbose output\n");
 }
 
@@ -91,15 +95,16 @@ int
 main(int argc, char **argv)
 {
 	int             pr = 0, silent = 0, ntp = 0, verbose = 0;
-	int		slidetime = 0, corrleaps = 0;
+	int		slidetime = 0, corrleaps = 0, useudp = 0;
 	char           *hname;
 	extern int      optind;
 	int             c;
 	int		family = PF_UNSPEC;
+	int		port = 0;
 
 	struct timeval new, adjust;
 
-	while ((c = getopt(argc, argv, "46psancv")) != -1)
+	while ((c = getopt(argc, argv, "46psancvuo:")) != -1)
 		switch (c) {
 		case '4':
 			family = PF_INET;
@@ -133,6 +138,14 @@ main(int argc, char **argv)
 			verbose++;
 			break;
 
+		case 'u':
+			useudp++;
+			break;
+
+		case 'o':
+			port = atoi(optarg);
+			break;
+
 		default:
 			usage();
 			return 1;
@@ -145,9 +158,9 @@ main(int argc, char **argv)
 	hname = argv[optind];
 
 	if (ntp)
-		ntp_client(hname, family, &new, &adjust, corrleaps);
+		ntp_client(hname, family, &new, &adjust, corrleaps, port);
 	else
-		rfc868time_client(hname, family, &new, &adjust, corrleaps);
+		rfc868time_client(hname, family, &new, &adjust, corrleaps, useudp, port);
 
 	if (!pr) {
 		if (!slidetime) {

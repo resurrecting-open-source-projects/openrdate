@@ -3,7 +3,8 @@
 /*
  * Copyright 1996-1997 N.M. Maclaren. All rights reserved.
  * Copyright 1996-1997 University of Cambridge. All rights reserved.
- * Copyright 2002      Thorsten "mirabile" Glaser.
+ * Copyright 2002      Thorsten "mirabile" Glaser
+ * Copyright 2007      Joey Hess <joeyh@debian.org>
  * Copyright 2007      Steve Langasek <vorlon@debian.org>
  *
  * Redistribution and use in source and binary forms, with or without
@@ -111,7 +112,7 @@ struct ntp_data {
 	u_int64_t	xmitck;
 };
 
-void	ntp_client(const char *, int, struct timeval *, struct timeval *, int);
+void	ntp_client(const char *, int, struct timeval *, struct timeval *, int, int);
 int	sync_ntp(int, const struct sockaddr *, double *, double *);
 int	write_packet(int, struct ntp_data *);
 int	read_packet(int, struct ntp_data *, double *, double *);
@@ -127,7 +128,7 @@ int	corrleaps;
 
 void
 ntp_client(const char *hostname, int family, struct timeval *new,
-    struct timeval *adjust, int leapflag)
+    struct timeval *adjust, int leapflag, int port)
 {
 	struct addrinfo hints, *res0, *res;
 	double offset, error;
@@ -136,7 +137,7 @@ ntp_client(const char *hostname, int family, struct timeval *new,
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = family;
 	hints.ai_socktype = SOCK_DGRAM;
-	ierror = getaddrinfo(hostname, "ntp", &hints, &res0);
+	ierror = getaddrinfo(hostname, port ? NULL : "ntp", &hints, &res0);
 	if (ierror) {
 		errx(1, "%s: %s", hostname, gai_strerror(ierror));
 		/*NOTREACHED*/
@@ -151,6 +152,10 @@ ntp_client(const char *hostname, int family, struct timeval *new,
 		s = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 		if (s < 0)
 			continue;
+		
+		if (port) {
+			((struct sockaddr_in*)res->ai_addr)->sin_port = htons(port);
+		}
 
 		ret = sync_ntp(s, res->ai_addr, &offset, &error);
 		if (ret < 0) {

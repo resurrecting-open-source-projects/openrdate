@@ -1,8 +1,10 @@
 .\"	$OpenBSD: rdate.8,v 1.30 2007/05/31 19:20:28 jmc Exp $
 .\"	$NetBSD: rdate.8,v 1.4 1996/04/08 20:55:17 jtc Exp $
 .\"
-.\" Copyright (c) 1994 Christos Zoulas
+.\" Copyright 1994 Christos Zoulas
 .\" All rights reserved.
+.\" Copyright 2007 Anibal Monsalve Salazar
+.\" Copyright 2007 Joey Hess <joeyh@debian.org>
 .\"
 .\" Redistribution and use in source and binary forms, with or without
 .\" modification, are permitted provided that the following conditions
@@ -37,7 +39,8 @@
 .Nd set the system's date from a remote host
 .Sh SYNOPSIS
 .Nm rdate
-.Op Fl 46acnpsv
+.Op Fl 46acnpsuv
+.Op Fl o Ar port
 .Ar host
 .Sh DESCRIPTION
 .Nm
@@ -76,10 +79,16 @@ server (with this parameter) or (recommended) check with a local radio
 controlled watch or phone service.
 .It Fl n
 Use SNTP (RFC 2030) instead of the RFC 868 time protocol.
+.It Fl o Ar port
+Use port
+.Ar port
+instead of port 37.
 .It Fl p
 Do not set, just print the remote time.
 .It Fl s
 Do not print the time.
+.It Fl u
+Use UDP instead of TCP as transport.
 .It Fl v
 Verbose output.
 Always show the adjustment.
@@ -108,9 +117,22 @@ To gradually adjust time once an hour after the first
 adjustment, put the following line into root's crontab:
 .Pp
 .D1 Li "58  *  *  *  *  rdate -ncav ptbtime1.ptb.de | logger -t NTP"
+.Pp
+To to set the time through an ssh tunnel, use something like so:
+.Pp
+.D1 Li ssh -f -L 10037:time.example.com:37 tyr.example.com sleep 10
+.D1 Li rdate -a -o 10037 locahost
+.Pp
 .Sh SEE ALSO
 .Xr date 1 ,
 .Xr adjtime 2 ,
 .Xr inetd 8 ,
 .Xr ntpd 8 ,
 .Xr timed 8
+.Sh AUTHORS
+This
+manual page was written by
+.An Christos Zoulas.
+It was changed by
+.An Anibal Monsalve Salazar
+for the Debian Project.
