@@ -128,6 +128,7 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 man_MANS = rdate.8
+EXTRA_DIST = rdate.8
 all: all-am
 
 .SUFFIXES:

@@ -1,3 +1,4 @@
+20061002 - Updated the arc4random.c to the latest OpenBSD version
 20060928 - Restructured source directory and files layout
 20060918 - Updated to latest OpenBSD rdate version
 20050211 - First release of openrdate
