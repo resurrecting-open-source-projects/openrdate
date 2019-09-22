@@ -18,6 +18,9 @@
 /* Define to 1 if you have the `c' library (-lc). */
 #undef HAVE_LIBC
 
+/* Define to 1 if you have the `pthread' library (-lpthread). */
+#undef HAVE_LIBPTHREAD
+
 /* Define to 1 if you have the `util' library (-lutil). */
 #undef HAVE_LIBUTIL
 
@@ -39,6 +42,9 @@
 
 /* Define to 1 if you have the <netinet/in.h> header file. */
 #undef HAVE_NETINET_IN_H
+
+/* Define to 1 if you have the <pthread.h> header file. */
+#undef HAVE_PTHREAD_H
 
 /* Define to 1 if you have the `select' function. */
 #undef HAVE_SELECT
@@ -126,6 +132,12 @@
 
 /* Version number of package */
 #undef VERSION
+
+/* Define Linux compile-time condition. */
+#undef __LINUX__
+
+/* Do not use the sysctl calls. */
+#undef __NO_SYSCTL__
 
 /* Define to empty if `const' does not conform to ANSI C. */
 #undef const

@@ -1,3 +1,4 @@
+20081121 - Updated to the latest version of arc4random.  Also implemented the use of the urandom device for linux kernel version >= 2.6.19 (see http://lwn.net/Articles/247243/).  Thanks to Dr. Markus Waldeck.
 20071111 - Updated everything to the latest OpenBSD version.  Also, rejiggered the makefiles just 'cause I could.
 20061002 - Updated the arc4random.c to the latest OpenBSD version
 20060928 - Restructured source directory and files layout

@@ -1,10 +1,10 @@
 20060918 - Well, after a long absence, I've gone and updated the code the latest OBSD version of rdate.
-20050211 - It has been my supreme pleasure to turn this piece of OpenBSD software into a package for use by non-OpenBSD users.  All copywrites and licenses are that of the original coder (I abhor borrowed plumage) and have applied my copywrite to only the code I've added.  But that being said, all errors and omissions are mine and mine alone.  If you find any, feel free to email at the address below.
+20050211 - It has been my supreme pleasure to turn this piece of OpenBSD software into a package for use by non-OpenBSD users.  All copyrights and licenses are that of the original coder (I abhor borrowed plumage) and have applied my copyright to only the code I've added.  But that being said, all errors and omissions are mine and mine alone.  If you find any, feel free to email at the address below.
 
 David Snyder
 dasnyderx(at)yahoo(dot)com
 
-The original authors and copywrite holders of this code are as follows:
+The original authors and copyright holders of this code are as follows:
 
 David Mazieres <dm@lcs.mit.edu>
 Thomas Roessler <roessler@sobolev.rhein.de> - thanx for the arc4random code!

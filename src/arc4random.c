@@ -1,7 +1,8 @@
-/*	$OpenBSD: arc4random.c,v 1.16 2007/02/12 19:58:47 otto Exp $	*/
+/*	$OpenBSD: arc4random.c,v 1.20 2008/10/03 18:46:04 otto Exp $	*/
 
 /*
  * Copyright (c) 1996, David Mazieres <dm@uun.org>
+ * Copyright (c) 2008, Damien Miller <djm@openbsd.org>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -32,14 +33,36 @@
  *
  * RC4 is a registered trademark of RSA Laboratories.
  */
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include <fcntl.h>
+#include <limits.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/param.h>
 #include <sys/time.h>
 #include <sys/sysctl.h>
+
+#if defined __NO_SYSCTL__
+#include <err.h>
+#include <errno.h>
+#include <stdio.h>
+#include <sys/stat.h>   /* for use with open() */
+#define RND_DEV "/dev/urandom"
+#define errmsg(msg) errx(1, "%s - %s", RND_DEV, msg);
+#endif                  /* __NO_SYSCTL__ */
+
+#if defined __LINUX__
+#include <pthread.h>	/* pthread_mutex_t pthread_mutex_lock(3) pthread_mutex_unlock(3) */
+static pthread_mutex_t mux;
+#define _ARC4_LOCK()  pthread_mutex_lock(&mux)
+#define _ARC4_UNLOCK() pthread_mutex_unlock(&mux)
+#else               /* !__LINUX__ */
+#include "thread_private.h"
+#endif              /* __LINUX__ */
 
 #ifdef __GNUC__
 #define inline __inline
@@ -59,121 +82,217 @@ static struct arc4_stream rs;
 static pid_t arc4_stir_pid;
 static int arc4_count;
 
-static inline u_int8_t arc4_getbyte(struct arc4_stream *);
-
-void arc4random_stir(void);
+static inline u_int8_t arc4_getbyte(void);
 
 static inline void
-arc4_init(struct arc4_stream *as)
+arc4_init(void)
 {
 	int     n;
 
 	for (n = 0; n < 256; n++)
-		as->s[n] = n;
-	as->i = 0;
-	as->j = 0;
+		rs.s[n] = n;
+	rs.i = 0;
+	rs.j = 0;
 }
 
 static inline void
-arc4_addrandom(struct arc4_stream *as, u_char *dat, int datlen)
+arc4_addrandom(u_char *dat, int datlen)
 {
 	int     n;
 	u_int8_t si;
 
-	as->i--;
+	rs.i--;
 	for (n = 0; n < 256; n++) {
-		as->i = (as->i + 1);
-		si = as->s[as->i];
-		as->j = (as->j + si + dat[n % datlen]);
-		as->s[as->i] = as->s[as->j];
-		as->s[as->j] = si;
+		rs.i = (rs.i + 1);
+		si = rs.s[rs.i];
+		rs.j = (rs.j + si + dat[n % datlen]);
+		rs.s[rs.i] = rs.s[rs.j];
+		rs.s[rs.j] = si;
 	}
-	as->j = as->i;
+	rs.j = rs.i;
 }
 
 static void
-arc4_stir(struct arc4_stream *as)
+arc4_stir(void)
 {
+#ifndef __NO_SYSCTL__
 	int     i, mib[2];
+#else   /* !__NO_SYSCTL__ */
+    int     i;
+#endif  /* !__NO_SYSCTL__ */
 	size_t	len;
 	u_char rnd[128];
 
+	if (!rs_initialized) {
+		arc4_init();
+		rs_initialized = 1;
+	}
+
+#ifndef __NO_SYSCTL__
 	mib[0] = CTL_KERN;
 	mib[1] = KERN_ARND;
+#endif /* __NO_SYSCTL__ */
 
 	len = sizeof(rnd);
+
+#ifndef __NO_SYSCTL__
 	sysctl(mib, 2, rnd, &len, NULL, 0);
+#else   /* __NO_SYSCTL__ */
+    int rndfd = open(RND_DEV, O_RDONLY);
+
+    if (rndfd == -1) {
+        switch(errno) {
+        case EACCES: errmsg("Unable to access device.");
+                     break;
+        case EPERM: errmsg("Device access permission denied.");
+                    break;
+        default: break;
+        }
+    }
+
+    ssize_t sizerd = read(rndfd, rnd, len);
+
+    if (sizerd != len || sizerd == -1) {
+        switch(errno) {
+        case EAGAIN: errmsg("No data is available.");
+                     break;
+        case EBADF: errmsg("Device file descriptor is invalid.");
+                    break;
+        case EINTR: errmsg("Device read was interrupted.");
+                    break;
+        default: break;
+        }
+    } 
+
+    close(rndfd);
+#endif /* __NO_SYSCTL__ */
 
 	arc4_stir_pid = getpid();
-	arc4_addrandom(as, rnd, sizeof(rnd));
+	arc4_addrandom(rnd, sizeof(rnd));
 
 	/*
 	 * Discard early keystream, as per recommendations in:
 	 * http://www.wisdom.weizmann.ac.il/~itsik/RC4/Papers/Rc4_ksa.ps
 	 */
 	for (i = 0; i < 256; i++)
-		(void)arc4_getbyte(as);
+		(void)arc4_getbyte();
 	arc4_count = 1600000;
 }
 
 static inline u_int8_t
-arc4_getbyte(struct arc4_stream *as)
+arc4_getbyte(void)
 {
 	u_int8_t si, sj;
 
-	as->i = (as->i + 1);
-	si = as->s[as->i];
-	as->j = (as->j + si);
-	sj = as->s[as->j];
-	as->s[as->i] = sj;
-	as->s[as->j] = si;
-	return (as->s[(si + sj) & 0xff]);
-}
-
-u_int8_t
-__arc4_getbyte(void)
-{
-	if (--arc4_count == 0 || !rs_initialized)
-		arc4random_stir();
-	return arc4_getbyte(&rs);
+	rs.i = (rs.i + 1);
+	si = rs.s[rs.i];
+	rs.j = (rs.j + si);
+	sj = rs.s[rs.j];
+	rs.s[rs.i] = sj;
+	rs.s[rs.j] = si;
+	return (rs.s[(si + sj) & 0xff]);
 }
 
 static inline u_int32_t
-arc4_getword(struct arc4_stream *as)
+arc4_getword(void)
 {
 	u_int32_t val;
-	val = arc4_getbyte(as) << 24;
-	val |= arc4_getbyte(as) << 16;
-	val |= arc4_getbyte(as) << 8;
-	val |= arc4_getbyte(as);
+	val = arc4_getbyte() << 24;
+	val |= arc4_getbyte() << 16;
+	val |= arc4_getbyte() << 8;
+	val |= arc4_getbyte();
 	return val;
 }
 
 void
 arc4random_stir(void)
 {
-	if (!rs_initialized) {
-		arc4_init(&rs);
-		rs_initialized = 1;
-	}
-	arc4_stir(&rs);
+	_ARC4_LOCK();
+	arc4_stir();
+	_ARC4_UNLOCK();
 }
 
 void
 arc4random_addrandom(u_char *dat, int datlen)
 {
+	_ARC4_LOCK();
 	if (!rs_initialized)
-		arc4random_stir();
-	arc4_addrandom(&rs, dat, datlen);
+		arc4_stir();
+	arc4_addrandom(dat, datlen);
+	_ARC4_UNLOCK();
 }
 
 u_int32_t
 arc4random(void)
 {
+	u_int32_t val;
+	_ARC4_LOCK();
 	arc4_count -= 4;
 	if (arc4_count <= 0 || !rs_initialized || arc4_stir_pid != getpid())
-		arc4random_stir();
-	return arc4_getword(&rs);
+		arc4_stir();
+	val = arc4_getword();
+	_ARC4_UNLOCK();
+	return val;
+}
+
+void
+arc4random_buf(void *_buf, size_t n)
+{
+	u_char *buf = (u_char *)_buf;
+	_ARC4_LOCK();
+	if (!rs_initialized || arc4_stir_pid != getpid())
+		arc4_stir();
+	while (n--) {
+		if (--arc4_count <= 0)
+			arc4_stir();
+		buf[n] = arc4_getbyte();
+	}
+	_ARC4_UNLOCK();
+}
+
+/*
+ * Calculate a uniformly distributed random number less than upper_bound
+ * avoiding "modulo bias".
+ *
+ * Uniformity is achieved by generating new random numbers until the one
+ * returned is outside the range [0, 2**32 % upper_bound).  This
+ * guarantees the selected random number will be inside
+ * [2**32 % upper_bound, 2**32) which maps back to [0, upper_bound)
+ * after reduction modulo upper_bound.
+ */
+u_int32_t
+arc4random_uniform(u_int32_t upper_bound)
+{
+	u_int32_t r, min;
+
+	if (upper_bound < 2)
+		return 0;
+
+#if (ULONG_MAX > 0xffffffffUL)
+	min = 0x100000000UL % upper_bound;
+#else
+	/* Calculate (2**32 % upper_bound) avoiding 64-bit math */
+	if (upper_bound > 0x80000000)
+		min = 1 + ~upper_bound;		/* 2**32 - upper_bound */
+	else {
+		/* (2**32 - (x * 2)) % x == 2**32 % x when x <= 2**31 */
+		min = ((0xffffffff - (upper_bound * 2)) + 1) % upper_bound;
+	}
+#endif
+
+	/*
+	 * This could theoretically loop forever but each retry has
+	 * p > 0.5 (worst case, usually far better) of selecting a
+	 * number inside the range we need, so it should rarely need
+	 * to re-roll.
+	 */
+	for (;;) {
+		r = arc4random();
+		if (r >= min)
+			break;
+	}
+
+	return r % upper_bound;
 }
 
 #if 0
