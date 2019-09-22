@@ -8,6 +8,7 @@
  * Copyright 2007      Steve Langasek <vorlon@debian.org>
  * Copyright 2008      Jérémy Bobbio <lunar@debian.org>
  * Copyright 2009      Cyril Brulebois <kibi@debian.org>
+ * Copyright 2009      Jakub Wilk <ubanus@users.sf.net>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -95,10 +96,6 @@
 #define MILLION_L    1000000l		/* For conversion to/from timeval */
 #define MILLION_D       1.0e6		/* Must be equal to MILLION_L */
 
-#ifdef __GLIBC__
-#define SA_LEN(x)	sizeof(*x)
-#endif
-
 struct ntp_data {
 	u_char		status;
 	u_char		version;
@@ -115,7 +112,7 @@ struct ntp_data {
 };
 
 void	ntp_client(const char *, int, struct timeval *, struct timeval *, int, int, int);
-int	sync_ntp(int, const struct sockaddr *, double *, double *, int);
+int	sync_ntp(int, const struct sockaddr *, socklen_t, double *, double *, int);
 int	write_packet(int, struct ntp_data *);
 int	read_packet(int, struct ntp_data *, double *, double *);
 void	unpack_ntp(struct ntp_data *, u_char *);
@@ -159,7 +156,8 @@ ntp_client(const char *hostname, int family, struct timeval *new,
 			((struct sockaddr_in*)res->ai_addr)->sin_port = htons(port);
 		}
 
-		ret = sync_ntp(s, res->ai_addr, &offset, &error, verbose);
+		ret = sync_ntp(s, res->ai_addr, res->ai_addrlen, &offset,
+			&error, verbose);
 		if (ret < 0) {
 #ifdef DEBUG
 			fprintf(stderr, "try the next address\n");
@@ -185,8 +183,8 @@ ntp_client(const char *hostname, int family, struct timeval *new,
 }
 
 int
-sync_ntp(int fd, const struct sockaddr *peer, double *offset, double *error,
-    int verbose)
+sync_ntp(int fd, const struct sockaddr *peer, socklen_t addrlen,
+    double *offset, double *error, int verbose)
 {
 	int attempts = 0, accepts = 0, rejects = 0;
 	int delay = MAX_DELAY, ret;
@@ -199,7 +197,7 @@ sync_ntp(int fd, const struct sockaddr *peer, double *offset, double *error,
 	*offset = 0.0;
 	*error = NTP_INSANITY;
 
-	if (connect(fd, peer, SA_LEN(peer)) < 0) {
+	if (connect(fd, peer, addrlen) < 0) {
 		warn("Failed to connect to server");
 		return (-1);
 	}
