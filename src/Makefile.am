@@ -1,6 +1,12 @@
-noinst_LIBRARIES=librdate.a
+bin_PROGRAMS = rdate
 
-librdate_a_SOURCES= \
+rdate_SOURCES = rdate.c
+
+rdate_LDADD = librdate.a -lbsd
+
+noinst_LIBRARIES = librdate.a
+
+librdate_a_SOURCES = \
                ntp.c \
                ntpleaps.c \
                rfc868time.c \

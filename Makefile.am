@@ -1,18 +1,8 @@
 SUBDIRS = src
 
-bin_PROGRAMS = rdate
+man_MANS= docs/rdate.8
 
-rdate_SOURCES= \
-        src/rdate.c
-
-rdate_LDADD= \
-        src/librdate.a -lbsd
-
-man_MANS= \
-    docs/rdate.8
-
-EXTRA_DIST= \
-    docs/rdate.8
+EXTRA_DIST= docs/rdate.8
 
 distclean-local:
 	rm -rf autom4te.cache/
