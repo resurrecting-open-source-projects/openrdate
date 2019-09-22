@@ -1,0 +1,1 @@
+20050211 - First packaging and deployment of openrdate.  Added configuration and makefile files.  Defined a SA_LEN macro in ntp.c.  Added an inclusion of config.h and changed an #ifdef in rdate.c
