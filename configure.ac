@@ -2,13 +2,20 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(openrdate, 1.1.2, dasnyderx_at_yahoo_dot_com)
+AC_INIT(openrdate, 1.1.3, dasnyderx_at_yahoo_dot_com)
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([src/rdate.c])
 AC_CONFIG_HEADER([config.h])
 
 # Checks for programs.
 AC_PROG_CC
+
+if test -n "$GCC"; then
+    CFLAGS="$CFLAGS -Wall"
+fi
+
+AC_PROG_INSTALL
+AC_PROG_RANLIB
 
 # Checks for libraries.
 # FIXME: Replace `main' with a function in `-lc':
@@ -35,5 +42,5 @@ AC_FUNC_SELECT_ARGTYPES
 AC_FUNC_STRFTIME
 AC_CHECK_FUNCS([gettimeofday memset select socket])
 
-AC_CONFIG_FILES([Makefile src/Makefile docs/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile])
 AC_OUTPUT

@@ -1,4 +1,4 @@
-/*	$OpenBSD: arc4random.c,v 1.15 2005/11/30 07:51:02 otto Exp $	*/
+/*	$OpenBSD: arc4random.c,v 1.16 2007/02/12 19:58:47 otto Exp $	*/
 
 /*
  * Copyright (c) 1996, David Mazieres <dm@uun.org>
@@ -61,6 +61,8 @@ static int arc4_count;
 
 static inline u_int8_t arc4_getbyte(struct arc4_stream *);
 
+void arc4random_stir(void);
+
 static inline void
 arc4_init(struct arc4_stream *as)
 {
@@ -111,7 +113,7 @@ arc4_stir(struct arc4_stream *as)
 	 */
 	for (i = 0; i < 256; i++)
 		(void)arc4_getbyte(as);
-	arc4_count = 400000;
+	arc4_count = 1600000;
 }
 
 static inline u_int8_t
@@ -126,6 +128,14 @@ arc4_getbyte(struct arc4_stream *as)
 	as->s[as->i] = sj;
 	as->s[as->j] = si;
 	return (as->s[(si + sj) & 0xff]);
+}
+
+u_int8_t
+__arc4_getbyte(void)
+{
+	if (--arc4_count == 0 || !rs_initialized)
+		arc4random_stir();
+	return arc4_getbyte(&rs);
 }
 
 static inline u_int32_t
@@ -160,7 +170,8 @@ arc4random_addrandom(u_char *dat, int datlen)
 u_int32_t
 arc4random(void)
 {
-	if (--arc4_count == 0 || !rs_initialized || arc4_stir_pid != getpid())
+	arc4_count -= 4;
+	if (arc4_count <= 0 || !rs_initialized || arc4_stir_pid != getpid())
 		arc4random_stir();
 	return arc4_getword(&rs);
 }

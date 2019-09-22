@@ -1,3 +1,4 @@
+20071111 - Updated the arc4random.c file and the rdate.8 manpage to the latest OpenBSD version.  Also, rejiggered the makefiles just 'cause I could.
 20060102 - Updated the arc4random.c file to the latest OpenBSD version.
 20060928 - Ok, I've gotten around to restructuring the source directory structure.  I know it's a bit of an overkill for such a small project, I wanted to try it.
 20060918 - Finally updated the package to the latest OpenBSD rdate version.  I

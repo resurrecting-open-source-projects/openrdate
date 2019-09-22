@@ -50,6 +50,7 @@
 #include <unistd.h>
 
 #include "ntpleaps.h"
+#include "arc4random.h"
 
 /*
  * NTP definitions.  Note that these assume 8-bit bytes - sigh.  There

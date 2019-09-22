@@ -34,7 +34,6 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-bin_PROGRAMS = rdate$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -44,13 +43,14 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
-am__installdirs = "$(DESTDIR)$(bindir)"
-binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
-PROGRAMS = $(bin_PROGRAMS)
-am_rdate_OBJECTS = arc4random.$(OBJEXT) ntp.$(OBJEXT) \
-	ntpleaps.$(OBJEXT) rdate.$(OBJEXT) rfc868time.$(OBJEXT)
-rdate_OBJECTS = $(am_rdate_OBJECTS)
-rdate_LDADD = $(LDADD)
+LIBRARIES = $(noinst_LIBRARIES)
+AR = ar
+ARFLAGS = cru
+librdate_a_AR = $(AR) $(ARFLAGS)
+librdate_a_LIBADD =
+am_librdate_a_OBJECTS = arc4random.$(OBJEXT) ntp.$(OBJEXT) \
+	ntpleaps.$(OBJEXT) rfc868time.$(OBJEXT)
+librdate_a_OBJECTS = $(am_librdate_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -58,8 +58,8 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(rdate_SOURCES)
-DIST_SOURCES = $(rdate_SOURCES)
+SOURCES = $(librdate_a_SOURCES)
+DIST_SOURCES = $(librdate_a_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -102,6 +102,7 @@ PACKAGE_STRING = @PACKAGE_STRING@
 PACKAGE_TARNAME = @PACKAGE_TARNAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 PATH_SEPARATOR = @PATH_SEPARATOR@
+RANLIB = @RANLIB@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 STRIP = @STRIP@
@@ -141,7 +142,14 @@ sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
-rdate_SOURCES = arc4random.c ntp.c ntpleaps.c rdate.c rfc868time.c ntpleaps.h arc4random.h 
+noinst_LIBRARIES = librdate.a
+librdate_a_SOURCES = arc4random.c \
+               ntp.c \
+               ntpleaps.c \
+               rfc868time.c \
+               ntpleaps.h \
+               arc4random.h 
+
 all: all-am
 
 .SUFFIXES:
@@ -175,32 +183,13 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
-install-binPROGRAMS: $(bin_PROGRAMS)
-	@$(NORMAL_INSTALL)
-	test -z "$(bindir)" || $(mkdir_p) "$(DESTDIR)$(bindir)"
-	@list='$(bin_PROGRAMS)'; for p in $$list; do \
-	  p1=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
-	  if test -f $$p \
-	  ; then \
-	    f=`echo "$$p1" | sed 's,^.*/,,;$(transform);s/$$/$(EXEEXT)/'`; \
-	   echo " $(INSTALL_PROGRAM_ENV) $(binPROGRAMS_INSTALL) '$$p' '$(DESTDIR)$(bindir)/$$f'"; \
-	   $(INSTALL_PROGRAM_ENV) $(binPROGRAMS_INSTALL) "$$p" "$(DESTDIR)$(bindir)/$$f" || exit 1; \
-	  else :; fi; \
-	done
 
-uninstall-binPROGRAMS:
-	@$(NORMAL_UNINSTALL)
-	@list='$(bin_PROGRAMS)'; for p in $$list; do \
-	  f=`echo "$$p" | sed 's,^.*/,,;s/$(EXEEXT)$$//;$(transform);s/$$/$(EXEEXT)/'`; \
-	  echo " rm -f '$(DESTDIR)$(bindir)/$$f'"; \
-	  rm -f "$(DESTDIR)$(bindir)/$$f"; \
-	done
-
-clean-binPROGRAMS:
-	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
-rdate$(EXEEXT): $(rdate_OBJECTS) $(rdate_DEPENDENCIES) 
-	@rm -f rdate$(EXEEXT)
-	$(LINK) $(rdate_LDFLAGS) $(rdate_OBJECTS) $(rdate_LDADD) $(LIBS)
+clean-noinstLIBRARIES:
+	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
+librdate.a: $(librdate_a_OBJECTS) $(librdate_a_DEPENDENCIES) 
+	-rm -f librdate.a
+	$(librdate_a_AR) librdate.a $(librdate_a_OBJECTS) $(librdate_a_LIBADD)
+	$(RANLIB) librdate.a
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -211,7 +200,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/arc4random.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ntp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ntpleaps.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rdate.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rfc868time.Po@am__quote@
 
 .c.o:
@@ -306,11 +294,8 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(PROGRAMS)
+all-am: Makefile $(LIBRARIES)
 installdirs:
-	for dir in "$(DESTDIR)$(bindir)"; do \
-	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
-	done
 install: install-am
 install-exec: install-exec-am
 install-data: install-data-am
@@ -337,7 +322,7 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-binPROGRAMS clean-generic mostlyclean-am
+clean-am: clean-generic clean-noinstLIBRARIES mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
@@ -357,7 +342,7 @@ info-am:
 
 install-data-am:
 
-install-exec-am: install-binPROGRAMS
+install-exec-am:
 
 install-info: install-info-am
 
@@ -382,18 +367,18 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS uninstall-info-am
+uninstall-am: uninstall-info-am
 
-.PHONY: CTAGS GTAGS all all-am check check-am clean clean-binPROGRAMS \
-	clean-generic ctags distclean distclean-compile \
+.PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
+	clean-noinstLIBRARIES ctags distclean distclean-compile \
 	distclean-generic distclean-tags distdir dvi dvi-am html \
-	html-am info info-am install install-am install-binPROGRAMS \
-	install-data install-data-am install-exec install-exec-am \
-	install-info install-info-am install-man install-strip \
-	installcheck installcheck-am installdirs maintainer-clean \
+	html-am info info-am install install-am install-data \
+	install-data-am install-exec install-exec-am install-info \
+	install-info-am install-man install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic pdf pdf-am ps ps-am tags uninstall \
-	uninstall-am uninstall-binPROGRAMS uninstall-info-am
+	uninstall-am uninstall-info-am
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
