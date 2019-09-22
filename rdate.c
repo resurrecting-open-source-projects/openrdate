@@ -5,8 +5,6 @@
  * Copyright (c) 1994 Christos Zoulas
  * All rights reserved.
  *
- * With slight modifications by David Snyder, copywrite (c) 2005
- *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:

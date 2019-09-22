@@ -1,11 +1,9 @@
-/*	$OpenBSD: ntp.c,v 1.27 2004/10/26 09:48:59 henning Exp $	*/
+/*	$OpenBSD: ntp.c,v 1.29 2006/09/17 17:03:56 ckuethe Exp $	*/
 
 /*
  * Copyright (c) 1996, 1997 by N.M. Maclaren. All rights reserved.
  * Copyright (c) 1996, 1997 by University of Cambridge. All rights reserved.
  * Copyright (c) 2002 by Thorsten "mirabile" Glaser.
- *
- * With very slight modifications by David Snyder, copywrite (c) 2004
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -119,7 +117,7 @@ void	unpack_ntp(struct ntp_data *, u_char *);
 double	current_time(double);
 void	create_timeval(double, struct timeval *, struct timeval *);
 
-#if DEBUG
+#ifdef DEBUG
 void	print_packet(const struct ntp_data *);
 #endif
 
@@ -244,6 +242,11 @@ sync_ntp(int fd, const struct sockaddr *peer, double *offset, double *error)
 
 		if (a > b) {
 			warnx("Inconsistent times received from NTP server");
+			return (-1);
+		}
+
+		if ((data.status & STATUS_ALARM) == STATUS_ALARM) {
+			warnx("Ignoring NTP server with alarm flag set");
 			return (-1);
 		}
 
