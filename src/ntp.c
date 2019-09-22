@@ -1,9 +1,10 @@
 /*	$OpenBSD: ntp.c,v 1.29 2006/09/17 17:03:56 ckuethe Exp $	*/
 
 /*
- * Copyright (c) 1996, 1997 by N.M. Maclaren. All rights reserved.
- * Copyright (c) 1996, 1997 by University of Cambridge. All rights reserved.
- * Copyright (c) 2002 by Thorsten "mirabile" Glaser.
+ * Copyright 1996-1997 N.M. Maclaren. All rights reserved.
+ * Copyright 1996-1997 University of Cambridge. All rights reserved.
+ * Copyright 2002      Thorsten "mirabile" Glaser.
+ * Copyright 2007      Steve Langasek <vorlon@debian.org>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -429,7 +430,7 @@ unpack_ntp(struct ntp_data *data, u_char *packet)
 	data->transmit = d / NTP_SCALE;
 
 	/* See write_packet for why this isn't an endian problem. */
-	data->recvck = *(u_int64_t *)(packet + NTP_ORIGINATE);
+	memcpy(&data->recvck,packet+NTP_ORIGINATE,8);
 }
 
 /*
