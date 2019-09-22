@@ -40,13 +40,6 @@
  *	Time is returned as the number of seconds since
  *	midnight January 1st 1900.
  */
-#ifndef lint
-#if 0
-from: static char rcsid[] = "$NetBSD: rdate.c,v 1.3 1996/02/22 06:59:18 thorpej Exp $";
-#else
-static const char rcsid[] = "$OpenBSD: rdate.c,v 1.22 2004/02/18 20:10:53 jmc Exp $";
-#endif
-#endif				/* lint */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

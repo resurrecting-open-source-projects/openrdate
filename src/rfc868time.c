@@ -40,14 +40,6 @@
  *	midnight January 1st 1900.
  */
 
-#ifndef lint
-#if 0
-from: static char rcsid[] = "$NetBSD: rdate.c,v 1.3 1996/02/22 06:59:18 thorpej Exp $";
-#else
-static const char rcsid[] = "$OpenBSD: rfc868time.c,v 1.6 2004/02/16 21:25:41 jakob Exp $";
-#endif
-#endif				/* lint */
-
 #include <sys/param.h>
 #include <sys/socket.h>
 #include <sys/time.h>
