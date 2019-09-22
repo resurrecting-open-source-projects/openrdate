@@ -6,6 +6,7 @@
  * Copyright 2002      Thorsten "mirabile" Glaser
  * Copyright 2007      Joey Hess <joeyh@debian.org>
  * Copyright 2007      Steve Langasek <vorlon@debian.org>
+ * Copyright 2008      Jérémy Bobbio <lunar@debian.org>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -112,8 +113,8 @@ struct ntp_data {
 	u_int64_t	xmitck;
 };
 
-void	ntp_client(const char *, int, struct timeval *, struct timeval *, int, int);
-int	sync_ntp(int, const struct sockaddr *, double *, double *);
+void	ntp_client(const char *, int, struct timeval *, struct timeval *, int, int, int);
+int	sync_ntp(int, const struct sockaddr *, double *, double *, int);
 int	write_packet(int, struct ntp_data *);
 int	read_packet(int, struct ntp_data *, double *, double *);
 void	unpack_ntp(struct ntp_data *, u_char *);
@@ -128,7 +129,7 @@ int	corrleaps;
 
 void
 ntp_client(const char *hostname, int family, struct timeval *new,
-    struct timeval *adjust, int leapflag, int port)
+    struct timeval *adjust, int leapflag, int port, int verbose)
 {
 	struct addrinfo hints, *res0, *res;
 	double offset, error;
@@ -157,7 +158,7 @@ ntp_client(const char *hostname, int family, struct timeval *new,
 			((struct sockaddr_in*)res->ai_addr)->sin_port = htons(port);
 		}
 
-		ret = sync_ntp(s, res->ai_addr, &offset, &error);
+		ret = sync_ntp(s, res->ai_addr, &offset, &error, verbose);
 		if (ret < 0) {
 #ifdef DEBUG
 			fprintf(stderr, "try the next address\n");
@@ -183,7 +184,8 @@ ntp_client(const char *hostname, int family, struct timeval *new,
 }
 
 int
-sync_ntp(int fd, const struct sockaddr *peer, double *offset, double *error)
+sync_ntp(int fd, const struct sockaddr *peer, double *offset, double *error,
+    int verbose)
 {
 	int attempts = 0, accepts = 0, rejects = 0;
 	int delay = MAX_DELAY, ret;
@@ -202,6 +204,10 @@ sync_ntp(int fd, const struct sockaddr *peer, double *offset, double *error)
 	}
 
 	while (accepts < MAX_QUERIES && attempts < 2 * MAX_QUERIES) {
+		if (verbose >= 2) {
+			fprintf(stderr, ".\n");
+			fflush(stderr);
+		}
 		memset(&data, 0, sizeof(data));
 
 		if (current_time(JAN_1970) > deadline) {

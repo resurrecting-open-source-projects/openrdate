@@ -4,6 +4,7 @@
 /*
  * Copyright 1994 Christos Zoulas
  * Copyright 2007 Joey Hess <joeyh@debian.org>
+ * Copyright 2008 Jérémy Bobbio <lunar@debian.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -71,7 +72,7 @@ static const char rcsid[] = "$OpenBSD: rdate.c,v 1.22 2004/02/18 20:10:53 jmc Ex
 #endif
 
 void rfc868time_client (const char *, int, struct timeval *, struct timeval *, int, int, int);
-void ntp_client (const char *, int, struct timeval *, struct timeval *, int, int);
+void ntp_client (const char *, int, struct timeval *, struct timeval *, int, int, int);
 
 extern char    *__progname;
 
@@ -158,7 +159,7 @@ main(int argc, char **argv)
 	hname = argv[optind];
 
 	if (ntp)
-		ntp_client(hname, family, &new, &adjust, corrleaps, port);
+		ntp_client(hname, family, &new, &adjust, corrleaps, port, verbose);
 	else
 		rfc868time_client(hname, family, &new, &adjust, corrleaps, useudp, port);
 
