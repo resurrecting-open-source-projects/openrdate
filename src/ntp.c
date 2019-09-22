@@ -7,6 +7,7 @@
  * Copyright 2007      Joey Hess <joeyh@debian.org>
  * Copyright 2007      Steve Langasek <vorlon@debian.org>
  * Copyright 2008      Jérémy Bobbio <lunar@debian.org>
+ * Copyright 2009      Cyril Brulebois <kibi@debian.org>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -53,7 +54,7 @@
 #include <unistd.h>
 
 #include "ntpleaps.h"
-#include "arc4random.h"
+#include <bsd/stdlib.h>
 
 /*
  * NTP definitions.  Note that these assume 8-bit bytes - sigh.  There

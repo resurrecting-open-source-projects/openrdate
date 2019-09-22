@@ -6,7 +6,7 @@ rdate_SOURCES= \
         src/rdate.c
 
 rdate_LDADD= \
-        src/librdate.a
+        src/librdate.a -lbsd
 
 man_MANS= \
     docs/rdate.8
