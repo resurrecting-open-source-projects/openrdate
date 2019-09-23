@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT([openrdate],[1.2],[dasnyderx_at_yahoo_dot_com])
+AC_INIT([openrdate],[1.10],[https://github.com/resurrecting-open-source-projects/openrdate/issues])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([src/rdate.c])
 AC_CONFIG_HEADER([config.h])
