@@ -1,9 +1,30 @@
-20081121 - Updated the arc4random.c to the latest OpenBSD version.  Modified the configure and arc4random to use the urandom dev instead of the sysctl since this is being deprecated in linux kernels >= 2.6.19.
-20071111 - Updated the arc4random.c file and the rdate.8 manpage to the latest OpenBSD version.  Also, rejiggered the makefiles just 'cause I could.
+2019-09-24  Joao Eriberto Mota Filho <eriberto@eriberto.pro.br>
+
+  * 
+
+============================================================
+=== OLD CHANGELOG, by David Snyder <dasnyderx@yahoo.com> ===
+============================================================
+
+20081121 - Updated the arc4random.c to the latest OpenBSD version.
+Modified the configure and arc4random to use the urandom dev instead of
+the sysctl since this is being deprecated in linux kernels >= 2.6.19.
+
+20071111 - Updated the arc4random.c file and the rdate.8 manpage to the
+latest OpenBSD version. Also, rejiggered the makefiles just 'cause I
+could.
+
 20060102 - Updated the arc4random.c file to the latest OpenBSD version.
-20060928 - Ok, I've gotten around to restructuring the source directory structure.  I know it's a bit of an overkill for such a small project, I wanted to try it.
-20060918 - Finally updated the package to the latest OpenBSD rdate version.  I
-know I should have done it sooner, but, you know, things pile up.  The primary
-difference is that ntp.c has been set to handle ntp responses with ALARM
-status.
-20050211 - First packaging and deployment of openrdate.  Added configuration and makefile files.  Defined a SA_LEN macro in ntp.c.  Added an inclusion of config.h and changed an #ifdef in rdate.c
+
+20060928 - Ok, I've gotten around to restructuring the source directory
+structure. I know it's a bit of an overkill for such a small project, I
+wanted to try it.
+
+20060918 - Finally updated the package to the latest OpenBSD rdate
+version. I know I should have done it sooner, but, you know, things pile
+up. The primary difference is that ntp.c has been set to handle ntp
+responses with ALARM status.
+
+20050211 - First packaging and deployment of openrdate.  Added
+configuration and makefile files. Defined a SA_LEN macro in ntp.c.
+Added an inclusion of config.h and changed an #ifdef in rdate.c
