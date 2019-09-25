@@ -1,9 +1,3 @@
-20060918 - Well, after a long absence, I've gone and updated the code the latest OBSD version of rdate.
-20050211 - It has been my supreme pleasure to turn this piece of OpenBSD software into a package for use by non-OpenBSD users.  All copyrights and licenses are that of the original coder (I abhor borrowed plumage) and have applied my copyright to only the code I've added.  But that being said, all errors and omissions are mine and mine alone.  If you find any, feel free to email at the address below.
-
-David Snyder
-dasnyderx(at)yahoo(dot)com
-
 The original authors and copyright holders of this code are as follows:
 
 David Mazieres <dm@lcs.mit.edu>
@@ -11,3 +5,23 @@ Thomas Roessler <roessler@sobolev.rhein.de> - thanx for the arc4random code!
 N.M. Maclaren
 Thorston "mirabile" Glaser
 Christos Zoulas
+
+The last maintainer in SF.net, between 2005 and 2008 was David Snyder
+<dasnyderx(at)yahoo(dot)com>. There are other people helping to fix the
+source code over time.
+
+Since 2019 the source code is being maintained by Joao Eriberto Mota Filho and
+volunteers at https://github.com/resurrecting-open-source-projects/openrdate
+
+
+The following messages were written by David Snyder inside this AUTHORS file:
+
+20050211 - It has been my supreme pleasure to turn this piece of OpenBSD
+software into a package for use by non-OpenBSD users. All copyrights and
+licenses are that of the original coder (I abhor borrowed plumage) and
+have applied my copyright to only the code I've added. But that being
+said, all errors and omissions are mine and mine alone. If you find any,
+feel free to email at the address below.
+
+20060918 - Well, after a long absence, I've gone and updated the code the
+latest OBSD version of rdate.
