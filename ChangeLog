@@ -14,7 +14,7 @@ the sysctl since this is being deprecated in linux kernels >= 2.6.19.
 latest OpenBSD version. Also, rejiggered the makefiles just 'cause I
 could.
 
-20060102 - Updated the arc4random.c file to the latest OpenBSD version.
+20061002 - Updated the arc4random.c file to the latest OpenBSD version.
 
 20060928 - Ok, I've gotten around to restructuring the source directory
 structure. I know it's a bit of an overkill for such a small project, I
@@ -28,3 +28,14 @@ responses with ALARM status.
 20050211 - First packaging and deployment of openrdate.  Added
 configuration and makefile files. Defined a SA_LEN macro in ntp.c.
 Added an inclusion of config.h and changed an #ifdef in rdate.c
+
+===========================================
+=== Old versions and dates, from SF.net ===
+===========================================
+
+2008-11-21: version 1.2
+2007-11-11: version 1.1.3
+2006-10-02: version 1.1.2
+2006-09-28: version 1.1.1
+2006-09-20: version 1.1
+2005-03-05: version 1.0
