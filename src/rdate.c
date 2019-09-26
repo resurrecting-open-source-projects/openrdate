@@ -6,6 +6,7 @@
  * Copyright 2005 David Snyder <dasnyderx@yahoo.com>
  * Copyright 2007 Joey Hess <joeyh@debian.org>
  * Copyright 2008 Jérémy Bobbio <lunar@debian.org>
+ * Copyright 2019 Joao Eriberto Mota Filho <eriberto@eriberto.pro.br>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
