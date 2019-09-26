@@ -3,6 +3,7 @@
 
 /*
  * Copyright 1994 Christos Zoulas
+ * Copyright 2005 David Snyder <dasnyderx@yahoo.com>
  * Copyright 2007 Joey Hess <joeyh@debian.org>
  * All rights reserved.
  *

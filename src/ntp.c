@@ -2,13 +2,15 @@
 
 /*
  * Copyright 1996-1997 N.M. Maclaren. All rights reserved.
- * Copyright 1996-1997 University of Cambridge. All rights reserved.
+ * Copyright 1996-1997 University of Cambridge.
  * Copyright 2002      Thorsten "mirabile" Glaser
+ * Copyright 2005-2007 David Snyder <dasnyderx@yahoo.com>
  * Copyright 2007      Joey Hess <joeyh@debian.org>
  * Copyright 2007      Steve Langasek <vorlon@debian.org>
  * Copyright 2008      Jérémy Bobbio <lunar@debian.org>
  * Copyright 2009      Cyril Brulebois <kibi@debian.org>
  * Copyright 2009      Jakub Wilk <ubanus@users.sf.net>
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
