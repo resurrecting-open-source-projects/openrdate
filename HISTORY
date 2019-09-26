@@ -1,0 +1,84 @@
+--------------------------------
+A brief of the openrdate history
+--------------------------------
+
+* Christos Zoulas developed rdate in 1994 and subsequent years (versions
+  1.0 up to 1.4) for OpenBSD project.
+
+* Between 2005 and 2008, David Snyder (and other volunteers later)
+  developed openrdate[1], fully based in rdate (but it is another
+  project). There are several contributions from other projects as
+  Debian.
+
+* Since 2019, the project is being maintained by new volunteers[2].
+  openrdate is being packaged in Debian, openSUSE, Fedora and other
+  distributions[3].
+
+ [1] https://sourceforge.net/projects/openrdate
+ [2] https://github.com/resurrecting-open-source-projects/openrdate
+ [3] https://repology.org/project/openrdate/versions
+
+ -- Joao Eriberto Mota Filho <eriberto@eriberto.pro.br>  Thu, 26 Sep 2019 11:18:09 -0300
+
+
+
+---------------------------
+David Snyder - Original POV
+---------------------------
+
+David Snyder wrote a README file for openrdate with some reports. See
+below the most interesting parts.
+
+
+--------------------------------------
+
+1. Motivations for OpenRdate
+
+I came over to Linux from OpenBSD. With that sort of background, it
+wasn't too hard to get around Linux. The only thing which bugged me was
+the lack of a proper 'rdate'. There was a dodgy little utility called
+'netdate', but this didn't work on my, primarily, OpenBSD system. So, I
+asked, why isn't there rdate.  Well, there is one
+(http://freshmeat.net/projects/rdate/), but it's only half the rdate I
+was used to on OpenBSD. It only hit the RFC 868 side-of-the-house, and I
+wanted the full monty (as it were :) ). Therefore, I did this little
+project. It'll hit and set the time on the machine both from RFC 868
+time-servers (on the inetd's time port 37) and RFC 2030 protocol SNTP/NTP
+servers (on ntpd's port 123). As an added bonus, I also got to port an
+OpenBSD app to the outside world.
+
+---------------------------------------
+
+2. Changes
+
+The changes/additions to the files of the original OpenBSD rdate have
+been minimal.  Only two files have had to be changed (due to the
+excellent *BSD coders):
+
+rdate.c - Added a check and inclusion of 'config.h' and changed an
+          #ifndef from NO_UTIL to #ifdef HAVE_UTIL_H
+
+ntp.c - Added a check for __GLIBC__ and made a definition for SA_LEN
+        (which Linux doesn't define for their sockaddr).
+
+Other than that, not much had to be changed or added.  I thought I had a
+problem with getaddrinfo(), but that was only due to, as we said in the
+Army, 'vapor lock on the brain'.
+
+----------------------------------------
+
+3. Attributions and Copywrite
+
+I've tried to put the proper attributions for the code for openrdate in
+the AUTHORS file.  If I've missed you, let me know.  The license of this
+software is, as shown in the parts and pieces of this project, BSD.
+Hopefully, I've covered all the different types of BSD-licenses used in
+the code in the COPYING file, but, once again, tell me if I missed one or
+another.
+
+Finally, I'd like to thank the coders, bug-hunters, and users of OpenBSD.
+You all run a tightship, and it's been a pleasure to work with some of
+your code.
+
+David Snyder
+dasnyderx at yahoo dot com
