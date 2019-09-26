@@ -1,5 +1,11 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
+#
+# Copyright 2005-2008 David Snyder <dasnyderx(at)yahoo(dot)com>
+# Copyright 2019      Joao Eriberto Mota Filho <eriberto@eriberto.pro.br>
+#
+# This file is under the same terms described by
+# LICENSE file for the main source code (rdate.c).
 
 AC_PREREQ(2.61)
 AC_INIT([openrdate],[1.10],[https://github.com/resurrecting-open-source-projects/openrdate/issues])
