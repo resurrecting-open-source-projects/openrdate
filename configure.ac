@@ -27,14 +27,13 @@ AC_PROG_RANLIB
 # Checks for libraries.
 AC_CHECK_LIB([c], [fork])
 AC_CHECK_LIB([util], [malloc])
-AC_CHECK_LIB([pthread], [pthread_testcancel])
 
 #
 # Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([arpa/inet.h fcntl.h float.h limits.h netdb.h \
                   netinet/in.h stdlib.h string.h sys/param.h sys/socket.h \
-                  sys/time.h unistd.h utmp.h util.h pthread.h])
+                  sys/time.h unistd.h util.h])
 AC_CHECK_HEADERS([bsd/stdlib.h], [], \
                   [echo "ERROR: previous header not found."; exit -1])
 
