@@ -130,7 +130,10 @@ ntpleaps_read(void)
 		return (-1);
 
 	/* Check signature */
-	read(fd, buf, 4);
+	if (read(fd, buf, 4) == 1) {
+	} else {
+	    printf("Fail in read command.\n");
+	}
 	buf[4] = 0;
 	if (strcmp((const char *)buf, "TZif")) {
 		close(fd);
@@ -144,7 +147,10 @@ ntpleaps_read(void)
 	buf[27] = 0;
 
 	/* Skip uninteresting parts of header */
-	read(fd, buf, 28);
+	if (read(fd, buf, 28) == 1) {
+	} else {
+	    printf("Fail in read command.\n");
+	}
 
 	/* Read number of leap second entries */
 	r = read_be_dword(&buf[24]);
@@ -159,7 +165,10 @@ ntpleaps_read(void)
 	}
 
 	/* Skip further uninteresting stuff */
-	read(fd, buf, 12);
+	if (read(fd, buf, 12) == 1) {
+	} else {
+            printf("Fail in read command.\n");
+	}
 	m1 = read_be_dword(buf);
 	m2 = read_be_dword(&buf[4]);
 	m3 = read_be_dword(&buf[8]);
