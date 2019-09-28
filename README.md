@@ -31,9 +31,9 @@ OpenRdate supports IPv4 and IPv6 protocols.
 OpenRdate was originally developed by David Snyder and was based in rdate,
 created by Christos Zoulas in 1994 for OpenBSD Project. Over time, OpenRdate
 got several contributions from people. Please, see AUTHORS and HISTORY files
-in source code.
+in source code  for more details.
 
-## BUILD AND INSTALL ##
+## Build and Install ##
 
 OpenRdate depends of libbsd[3] to build.
 
@@ -50,7 +50,44 @@ To return to original source code you can use '$ make distclean' command.
 
 On Debian systems you can use '# apt install rdate'.
 
-## AUTHOR ##
+## How to set a time server in Debian ##
+
+For test purposes, you can set your own time server. However, how to make it
+will depend of your system. For Debian systems, you can set it easily.
+
+### For time protocol (RFC 868, port 37 TCP/UDP): ###
+
+    # apt-get install xinetd
+    # nano /etc/xinetd.d/time
+
+Change the lines:
+
+    disable = yes
+
+to
+
+    disable = no
+
+Restart the xinetd daemon:
+
+    # systemctl restart xinetd
+
+Verify the open ports:
+
+    # ss -tunlp
+
+Test rdate:
+
+    # rdate <server_ip>
+
+### For SNTP protocol (RFC 5905, port 123 UDP) ###
+
+You can set a SNTP server using several available options. However, there are
+lot of public servers on Internet. So, you can use:
+
+    # rdate -n pool.ntp.org
+
+## Author ##
 
 OpenRdate was originally developed by David Snyder under BSD-4-Clause license.
 
