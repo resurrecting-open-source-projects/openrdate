@@ -17,6 +17,8 @@
 The time source may be an RFC 868 TCP protocol server, which is usually implemented as a built-in
 service of \fBinetd\fP(8), or an RFC 5905 protocol SNTP/NTP server. By default, \fBrdate\fP uses the RFC 868 TCP
 protocol.
+.PP
+OpenRdate supports IPv4 and IPv6 protocols.
 .SH OPTIONS
 .TP
 .B
@@ -66,7 +68,7 @@ Use UDP instead of TCP as transport.
 .TP
 .B
 \fB-t\fP \fImsec\fP
-Does not set time if it took more than \fImsec\fP miliseconds to fetch time from network.
+Does not set time if it took more than \fImsec\fP milliseconds to fetch time from network.
 .TP
 .B
 \fB-v\fP
@@ -110,5 +112,8 @@ To set the time through an ssh tunnel, use something like so:
 .SH SEE ALSO
 \fBdate\fP(1), \fBadjtime\fP(2), \fBinetd\fP(8), \fBntpd\fP(8), \fBntpdate\fP(8), \fBtimed\fP(8)
 .SH AUTHORS
+OpenRdate was originally developed by David Snyder and was based in \fBrdate\fP, created by Christos Zoulas
+in 1994 for OpenBSD Project. Over time, OpenRdate got several contributions from people.
+.PP
 This manual page was written by Christos Zoulas. It was changed by Anibal Monsalve Salazar for
 the Debian Project and updated by Joao Eriberto Mota Filho.

@@ -10,6 +10,8 @@ DESCRIPTION
   service of inetd(8), or an RFC 5905 protocol SNTP/NTP server. By default, rdate uses the RFC 868 TCP
   protocol.
 
+  OpenRdate supports IPv4 and IPv6 protocols.
+
 OPTIONS
   -4  Force rdate to use IPv4 addresses only.
   -6  Force rdate to use IPv6 addresses only.
@@ -26,7 +28,7 @@ OPTIONS
   -p  Do not set, just print the remote time.
   -s  Do not print the time.
   -u  Use UDP instead of TCP as transport.
-  -t msec  Does not set time if it took more than msec miliseconds to fetch time from network.
+  -t msec  Does not set time if it took more than msec milliseconds to fetch time from network.
   -v  Verbose output. Always show the adjustment.
 
 FILES
@@ -55,5 +57,8 @@ SEE ALSO
   date(1), adjtime(2), inetd(8), ntpd(8), ntpdate(8), timed(8)
 
 AUTHORS
+  OpenRdate was originally developed by David Snyder and was based in rdate, created by Christos Zoulas
+  in 1994 for OpenBSD Project. Over time, OpenRdate got several contributions from people.
+
   This manual page was written by Christos Zoulas. It was changed by Anibal Monsalve Salazar for
   the Debian Project and updated by Joao Eriberto Mota Filho.
