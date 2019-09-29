@@ -5,7 +5,7 @@
 #
 # This script can be used under BSD-3-Clause license.
 
-T2M_DATE="23 Sep 2019"
+T2M_DATE="29 Sep 2019"
 T2M_NAME=rdate
 T2M_VERSION=1.10
 T2M_LEVEL=8

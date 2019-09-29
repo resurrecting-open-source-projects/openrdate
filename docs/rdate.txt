@@ -2,7 +2,7 @@ NAME
   rdate - set the system's date from a remote host
 
 SYNOPSIS
-  rdate [-46acnpsuv] [-o port] host
+  rdate [-46acnpsuv] [-b sec] [-o port] [-t msec] host
 
 DESCRIPTION
   rdate displays and sets the local date and time from the host name or address given as the argument.
@@ -15,6 +15,8 @@ OPTIONS
   -6  Force rdate to use IPv6 addresses only.
   -a  Use the adjtime(2) call to gradually skew the local time to the remote time rather than just
       hopping.
+  -b sec  Use adjtime if clock difference is at most sec seconds or hop if difference is greater. This
+          is the same as including of removing the option -a, based on clock difference.
   -c  Correct leap seconds. Sometimes required when synchronizing to an NTP server. When synchronizing
       using the RFC 868 protocol, use this option only if the server does not correctly account for leap
       seconds. You can determine if you need this parameter if you sync against an NTP server (with this
@@ -24,6 +26,7 @@ OPTIONS
   -p  Do not set, just print the remote time.
   -s  Do not print the time.
   -u  Use UDP instead of TCP as transport.
+  -t msec  Does not set time if it took more than msec miliseconds to fetch time from network.
   -v  Verbose output. Always show the adjustment.
 
 FILES

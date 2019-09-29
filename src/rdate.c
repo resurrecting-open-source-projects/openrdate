@@ -6,6 +6,7 @@
  * Copyright 2005 David Snyder <dasnyderx@yahoo.com>
  * Copyright 2007 Joey Hess <joeyh@debian.org>
  * Copyright 2008 Jérémy Bobbio <lunar@debian.org>
+ * Copyright 2009 Pedro Zorzenon Neto <pedro@pzn.com.br>
  * Copyright 2019 Joao Eriberto Mota Filho <eriberto@eriberto.pro.br>
  * All rights reserved.
  *
@@ -74,16 +75,19 @@ extern char    *__progname;
 void
 usage(void)
 {
-	(void) fprintf(stderr, "Usage: %s [-46acnpsv] [-o port] host\n", __progname);
+	(void) fprintf(stderr, "Usage: %s [-46acnpsv] [ -b sec ] [-o port] [ -t msec ] host\n", __progname);
 	(void) fprintf(stderr, "  -4: use IPv4 only\n");
 	(void) fprintf(stderr, "  -6: use IPv6 only\n");
 	(void) fprintf(stderr, "  -a: use adjtime instead of instant change\n");
+	(void) fprintf(stderr, "  -b num: use instant change if difference is greater than\n"
+		               "          num seconds, or else use adjtime\n");
 	(void) fprintf(stderr, "  -c: correct leap second count\n");
 	(void) fprintf(stderr, "  -n: use SNTP instead of RFC868 time protocol\n");
 	(void) fprintf(stderr, "  -o num: override time port with num\n");
 	(void) fprintf(stderr, "  -p: just print, don't set\n");
 	(void) fprintf(stderr, "  -s: just set, don't print\n");
 	(void) fprintf(stderr, "  -u: use UDP instead of TCP as transport\n");
+	(void) fprintf(stderr, "  -t msec: does not set clock if network delay greater than msec\n");
 	(void) fprintf(stderr, "  -v: verbose output\n");
 }
 
@@ -99,8 +103,13 @@ main(int argc, char **argv)
 	int		port = 0;
 
 	struct timeval new, adjust;
+	int		maxdelay = 0;
+	int		netdelay = 0;
+	struct timeval  netdelay1, netdelay2;
+	struct timezone tz;
+	int             conditionalslide = 0;
 
-	while ((c = getopt(argc, argv, "46psancvuo:")) != -1)
+	while ((c = getopt(argc, argv, "46psancvuo:t:b:")) != -1)
 		switch (c) {
 		case '4':
 			family = PF_INET;
@@ -142,6 +151,14 @@ main(int argc, char **argv)
 			port = atoi(optarg);
 			break;
 
+		case 't':
+			maxdelay = atoi(optarg);
+			break;
+
+		case 'b':
+			conditionalslide = atoi(optarg);
+			break;
+
 		default:
 			usage();
 			return 1;
@@ -153,12 +170,36 @@ main(int argc, char **argv)
 	}
 	hname = argv[optind];
 
+	if (maxdelay) {
+	  gettimeofday(&netdelay1, &tz);
+	}
 	if (ntp)
 		ntp_client(hname, family, &new, &adjust, corrleaps, port, verbose);
 	else
 		rfc868time_client(hname, family, &new, &adjust, corrleaps, useudp, port);
 
+	if (maxdelay) {
+	  gettimeofday(&netdelay2, &tz);
+	  netdelay = (netdelay2.tv_sec - netdelay1.tv_sec) * 1000;
+	  netdelay += (netdelay2.tv_usec - netdelay1.tv_usec) / 1000;
+	  if (netdelay > maxdelay) {
+	    fprintf(stderr, "%s: Network delay exceeded (%i msec)\n",
+		    __progname, netdelay);
+	    exit(2);
+	  }
+	}
+
 	if (!pr) {
+
+	  if (conditionalslide) {
+	    if (((adjust.tv_sec > 0) && (adjust.tv_sec > conditionalslide)) ||
+		((adjust.tv_sec < 0) && ((-adjust.tv_sec) > conditionalslide))) {
+	      slidetime = 0;
+	    } else {
+	      slidetime = 1;
+	    }
+	  }
+	    
 		if (!slidetime) {
 			logwtmp("|", "date", "");
 			if (settimeofday(&new, NULL) == -1)
@@ -183,15 +224,32 @@ main(int argc, char **argv)
 		adjsec  = adjust.tv_sec + adjust.tv_usec / 1.0e6;
 
 		if (slidetime || verbose) {
+		  char slidemsg[32];
+		  if (conditionalslide) {
+		    if (slidetime) {
+		      strcpy(slidemsg," (adjtime)");
+		    } else {
+		      strcpy(slidemsg," (instant change)");
+		    }
+		  } else {
+		    strcpy(slidemsg,"");
+		  }
 			if (ntp)
 				(void) fprintf(stdout,
-				   "%s: adjust local clock by %.6f seconds\n",
-				   __progname, adjsec);
+				   "%s: adjust local clock by %.6f seconds%s\n",
+					       __progname, adjsec, slidemsg);
 			else
 				(void) fprintf(stdout,
-				   "%s: adjust local clock by %ld seconds\n",
-				   __progname, adjust.tv_sec);
+				   "%s: adjust local clock by %ld seconds%s\n",
+				   __progname, adjust.tv_sec, slidemsg);
 		}
+
+		if (verbose && maxdelay) {
+		  (void) fprintf(stdout,
+				 "%s: network delay %i msecs\n",
+				 __progname, netdelay);		  
+		}
+
 	}
 
 	return 0;
