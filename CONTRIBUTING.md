@@ -4,7 +4,7 @@ OpenRdate is available at
 https://github.com/resurrecting-open-source-projects/openrdate
 
 If you are interested in contribute to OpenRdate development, please, follow
-the following steps:
+these steps:
 
 1. Send a patch that fix an issue or that implement a new feature.
    Alternatively, you can do a 'pull request'[1] in GitHub.
