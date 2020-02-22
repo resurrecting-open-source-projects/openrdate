@@ -11,7 +11,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: install_dependencies
       run: sudo apt install libbsd-dev
-    - name: first_step
+    - name: first_build
       run: |
            ./autogen.sh
            ./configure
@@ -19,3 +19,14 @@ jobs:
            sudo make install
            sudo make uninstall
            make distclean 
+    - name: second_build
+      run: |
+           ./autogen.sh
+           ./configure
+           make
+           sudo make install
+    - name: run_program
+      run: |
+           rdate 2>&1 | grep Usage
+           rdate -pn4v ntp.on.br
+           
