@@ -6,11 +6,14 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v2
     - name: install_dependencies
-      run: sudo apt install libbsd-dev
+      run: sudo apt install libbsd-dev mandoc
+    - name: check_ manpage
+      run: |
+           mandoc -T lint -W warning docs/rdate.8
     - name: first_build
       run: |
            ./autogen.sh
@@ -18,7 +21,7 @@ jobs:
            make
            sudo make install
            sudo make uninstall
-           make distclean 
+           make distclean
     - name: second_build
       run: |
            ./autogen.sh
@@ -29,4 +32,3 @@ jobs:
       run: |
            rdate 2>&1 | grep Usage
            rdate -pn4v ntp.on.br
-           
