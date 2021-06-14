@@ -1,3 +1,14 @@
+2021-06-14  Joao Eriberto Mota Filho <eriberto@eriberto.pro.br>
+Version 1.10.1
+
+    [ Joao Eriberto Mota Filho ]
+
+ * Created a CI test workflow for GitHub (full-check.yml).
+ * Fixed a grammatical error in CONTRIBUTING.md.
+ * Manpage: added new notes about -n, -o and -u options, to make
+   clear that SNTP (RFC 5905) will always use UDP protocol. Thanks
+   to artur128 <artur@akk.org>, via Debian bug #988649.
+
 2019-09-29  Joao Eriberto Mota Filho <eriberto@eriberto.pro.br>
 Version 1.10
 
