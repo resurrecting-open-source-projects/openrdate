@@ -23,11 +23,12 @@ OPTIONS
       using the RFC 868 protocol, use this option only if the server does not correctly account for leap
       seconds. You can determine if you need this parameter if you sync against an NTP server (with this
       parameter) or (recommended) check with a local radio controlled watch or phone service.
-  -n  Use SNTP (old RFC 2030, currently RFC 5905) instead of the RFC 868 time protocol.
-  -o port  Use port 'port' instead of port 37.
+  -n  Use SNTP (old RFC 2030, currently RFC 5905) instead of the RFC 868 time protocol. SNTP will always
+      use UDP protocol and its default port is 123.
+  -o port  Use port 'port' instead of port 37 (RFC 868) or 123 (SNTP, RFC 5905).
   -p  Do not set, just print the remote time.
   -s  Do not print the time.
-  -u  Use UDP instead of TCP as transport.
+  -u  Use UDP instead of TCP as transport (for RFC 868 only; see -n option).
   -t msec  Does not set time if it took more than msec milliseconds to fetch time from network.
   -v  Verbose output. Always show the adjustment.
 

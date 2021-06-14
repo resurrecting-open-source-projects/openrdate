@@ -5,9 +5,9 @@
 #
 # This script can be used under BSD-3-Clause license.
 
-T2M_DATE="29 Sep 2019"
+T2M_DATE="14 Jun 2021"
 T2M_NAME=rdate
-T2M_VERSION=1.10
+T2M_VERSION=1.10.1
 T2M_LEVEL=8
 T2M_DESC="set the system's date from a remote host"
 
