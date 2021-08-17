@@ -99,18 +99,18 @@
 #define MILLION_D       1.0e6		/* Must be equal to MILLION_L */
 
 struct ntp_data {
-	u_char		status;
-	u_char		version;
-	u_char		mode;
-	u_char		stratum;
-	double		receive;
-	double		transmit;
-	double		current;
-	u_int64_t	recvck;
+    u_char		status;
+    u_char		version;
+    u_char		mode;
+    u_char		stratum;
+    double		receive;
+    double		transmit;
+    double		current;
+    u_int64_t	recvck;
 
-	/* Local State */
-	double		originate;
-	u_int64_t	xmitck;
+    /* Local State */
+    double		originate;
+    u_int64_t	xmitck;
 };
 
 void	ntp_client(const char *, int, struct timeval *, struct timeval *, int, int, int);
@@ -129,189 +129,189 @@ int	corrleaps;
 
 void
 ntp_client(const char *hostname, int family, struct timeval *new,
-    struct timeval *adjust, int leapflag, int port, int verbose)
+           struct timeval *adjust, int leapflag, int port, int verbose)
 {
-	struct addrinfo hints, *res0, *res;
-	double offset, error;
-	int accept = 0, ret, s, ierror;
+    struct addrinfo hints, *res0, *res;
+    double offset, error;
+    int accept = 0, ret, s, ierror;
 
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = family;
-	hints.ai_socktype = SOCK_DGRAM;
-	ierror = getaddrinfo(hostname, port ? NULL : "ntp", &hints, &res0);
-	if (ierror) {
-		errx(1, "%s: %s", hostname, gai_strerror(ierror));
-		/*NOTREACHED*/
-	}
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = family;
+    hints.ai_socktype = SOCK_DGRAM;
+    ierror = getaddrinfo(hostname, port ? NULL : "ntp", &hints, &res0);
+    if (ierror) {
+        errx(1, "%s: %s", hostname, gai_strerror(ierror));
+        /*NOTREACHED*/
+    }
 
-	corrleaps = leapflag;
-	if (corrleaps)
-		ntpleaps_init();
+    corrleaps = leapflag;
+    if (corrleaps)
+        ntpleaps_init();
 
-	s = -1;
-	for (res = res0; res; res = res->ai_next) {
-		s = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-		if (s < 0)
-			continue;
-		
-		if (port) {
-			((struct sockaddr_in*)res->ai_addr)->sin_port = htons(port);
-		}
+    s = -1;
+    for (res = res0; res; res = res->ai_next) {
+        s = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+        if (s < 0)
+            continue;
 
-		ret = sync_ntp(s, res->ai_addr, res->ai_addrlen, &offset,
-			&error, verbose);
-		if (ret < 0) {
+        if (port) {
+            ((struct sockaddr_in*)res->ai_addr)->sin_port = htons(port);
+        }
+
+        ret = sync_ntp(s, res->ai_addr, res->ai_addrlen, &offset,
+                       &error, verbose);
+        if (ret < 0) {
 #ifdef DEBUG
-			fprintf(stderr, "try the next address\n");
+            fprintf(stderr, "try the next address\n");
 #endif
-			close(s);
-			s = -1;
-			continue;
-		}
+            close(s);
+            s = -1;
+            continue;
+        }
 
-		accept++;
-		break;
-	}
-	freeaddrinfo(res0);
+        accept++;
+        break;
+    }
+    freeaddrinfo(res0);
 
 #ifdef DEBUG
-	fprintf(stderr, "Correction: %.6f +/- %.6f\n", offset, error);
+    fprintf(stderr, "Correction: %.6f +/- %.6f\n", offset, error);
 #endif
 
-	if (accept < 1)
-		errx(1, "Unable to get a reasonable time estimate");
+    if (accept < 1)
+        errx(1, "Unable to get a reasonable time estimate");
 
-	create_timeval(offset, new, adjust);
+    create_timeval(offset, new, adjust);
 }
 
 int
 sync_ntp(int fd, const struct sockaddr *peer, socklen_t addrlen,
-    double *offset, double *error, int verbose)
+         double *offset, double *error, int verbose)
 {
-	int attempts = 0, accepts = 0, rejects = 0;
-	int delay = MAX_DELAY, ret;
-	double deadline;
-	double a, b, x, y;
-	double minerr = 0.1;		/* Maximum ignorable variation */
-	struct ntp_data data;
+    int attempts = 0, accepts = 0, rejects = 0;
+    int delay = MAX_DELAY, ret;
+    double deadline;
+    double a, b, x, y;
+    double minerr = 0.1;		/* Maximum ignorable variation */
+    struct ntp_data data;
 
-	deadline = current_time(JAN_1970) + delay;
-	*offset = 0.0;
-	*error = NTP_INSANITY;
+    deadline = current_time(JAN_1970) + delay;
+    *offset = 0.0;
+    *error = NTP_INSANITY;
 
-	if (connect(fd, peer, addrlen) < 0) {
-		warn("Failed to connect to server");
-		return (-1);
-	}
+    if (connect(fd, peer, addrlen) < 0) {
+        warn("Failed to connect to server");
+        return (-1);
+    }
 
-	while (accepts < MAX_QUERIES && attempts < 2 * MAX_QUERIES) {
-		if (verbose >= 2) {
-			fprintf(stderr, ".\n");
-			fflush(stderr);
-		}
-		memset(&data, 0, sizeof(data));
+    while (accepts < MAX_QUERIES && attempts < 2 * MAX_QUERIES) {
+        if (verbose >= 2) {
+            fprintf(stderr, ".\n");
+            fflush(stderr);
+        }
+        memset(&data, 0, sizeof(data));
 
-		if (current_time(JAN_1970) > deadline) {
-			warnx("Not enough valid responses received in time");
-			return (-1);
-		}
+        if (current_time(JAN_1970) > deadline) {
+            warnx("Not enough valid responses received in time");
+            return (-1);
+        }
 
-		if (write_packet(fd, &data) < 0)
-			return (-1);
+        if (write_packet(fd, &data) < 0)
+            return (-1);
 
-		ret = read_packet(fd, &data, &x, &y);
+        ret = read_packet(fd, &data, &x, &y);
 
-		if (ret < 0)
-			return (-1);
-		else if (ret > 0) {
+        if (ret < 0)
+            return (-1);
+        else if (ret > 0) {
 #ifdef DEBUG
-			print_packet(&data);
+            print_packet(&data);
 #endif
 
-			if (++rejects > MAX_QUERIES) {
-				warnx("Too many bad or lost packets");
-				return (-1);
-			} else
-				continue;
-		} else
-			++accepts;
+            if (++rejects > MAX_QUERIES) {
+                warnx("Too many bad or lost packets");
+                return (-1);
+            } else
+                continue;
+        } else
+            ++accepts;
 
 #ifdef DEBUG
-		fprintf(stderr, "Offset: %.6f +/- %.6f\n", x, y);
+        fprintf(stderr, "Offset: %.6f +/- %.6f\n", x, y);
 #endif
 
-		if ((a = x - *offset) < 0.0)
-			a = -a;
-		if (accepts <= 1)
-			a = 0.0;
-		b = *error + y;
-		if (y < *error) {
-			*offset = x;
-			*error = y;
-		}
+        if ((a = x - *offset) < 0.0)
+            a = -a;
+        if (accepts <= 1)
+            a = 0.0;
+        b = *error + y;
+        if (y < *error) {
+            *offset = x;
+            *error = y;
+        }
 
 #ifdef DEBUG
-		fprintf(stderr, "Best: %.6f +/- %.6f\n", *offset, *error);
+        fprintf(stderr, "Best: %.6f +/- %.6f\n", *offset, *error);
 #endif
 
-		if (a > b) {
-			warnx("Inconsistent times received from NTP server");
-			return (-1);
-		}
+        if (a > b) {
+            warnx("Inconsistent times received from NTP server");
+            return (-1);
+        }
 
-		if ((data.status & STATUS_ALARM) == STATUS_ALARM) {
-			warnx("Ignoring NTP server with alarm flag set");
-			return (-1);
-		}
+        if ((data.status & STATUS_ALARM) == STATUS_ALARM) {
+            warnx("Ignoring NTP server with alarm flag set");
+            return (-1);
+        }
 
-		if (*error <= minerr)
-			break;
-	}
+        if (*error <= minerr)
+            break;
+    }
 
-	return (accepts);
+    return (accepts);
 }
 
 /* Send out NTP packet. */
 int
 write_packet(int fd, struct ntp_data *data)
 {
-	u_char	packet[NTP_PACKET_MIN];
-	ssize_t	length;
+    u_char	packet[NTP_PACKET_MIN];
+    ssize_t	length;
 
-	memset(packet, 0, sizeof(packet));
+    memset(packet, 0, sizeof(packet));
 
-	packet[0] = (NTP_VERSION << 3) | (NTP_MODE_CLIENT);
+    packet[0] = (NTP_VERSION << 3) | (NTP_MODE_CLIENT);
 
-	data->xmitck = (u_int64_t)arc4random() << 32 | arc4random();
+    data->xmitck = (u_int64_t)arc4random() << 32 | arc4random();
 
-	/*
-	 * Send out a random 64-bit number as our transmit time.  The NTP
-	 * server will copy said number into the originate field on the
-	 * response that it sends us.  This is totally legal per the SNTP spec.
-	 *
-	 * The impact of this is two fold: we no longer send out the current
-	 * system time for the world to see (which may aid an attacker), and
-	 * it gives us a (not very secure) way of knowing that we're not
-	 * getting spoofed by an attacker that can't capture our traffic
-	 * but can spoof packets from the NTP server we're communicating with.
-	 *
-	 * No endian concerns here.  Since we're running as a strict
-	 * unicast client, we don't have to worry about anyone else finding
-	 * the transmit field intelligible.
-	 */
+    /*
+     * Send out a random 64-bit number as our transmit time.  The NTP
+     * server will copy said number into the originate field on the
+     * response that it sends us.  This is totally legal per the SNTP spec.
+     *
+     * The impact of this is two fold: we no longer send out the current
+     * system time for the world to see (which may aid an attacker), and
+     * it gives us a (not very secure) way of knowing that we're not
+     * getting spoofed by an attacker that can't capture our traffic
+     * but can spoof packets from the NTP server we're communicating with.
+     *
+     * No endian concerns here.  Since we're running as a strict
+     * unicast client, we don't have to worry about anyone else finding
+     * the transmit field intelligible.
+     */
 
-	*(u_int64_t *)(packet + NTP_TRANSMIT) = data->xmitck;
+    *(u_int64_t *)(packet + NTP_TRANSMIT) = data->xmitck;
 
-	data->originate = current_time(JAN_1970);
+    data->originate = current_time(JAN_1970);
 
-	length = write(fd, packet, sizeof(packet));
+    length = write(fd, packet, sizeof(packet));
 
-	if (length != sizeof(packet)) {
-		warn("Unable to send NTP packet to server");
-		return (-1);
-	}
+    if (length != sizeof(packet)) {
+        warn("Unable to send NTP packet to server");
+        return (-1);
+    }
 
-	return (0);
+    return (0);
 }
 
 /*
@@ -323,94 +323,94 @@ write_packet(int fd, struct ntp_data *data)
 int
 read_packet(int fd, struct ntp_data *data, double *off, double *error)
 {
-	u_char	receive[NTP_PACKET_MAX];
-	struct	timeval tv;
-	double	x, y;
-	int	length, r;
-	fd_set	*rfds;
+    u_char	receive[NTP_PACKET_MAX];
+    struct	timeval tv;
+    double	x, y;
+    int	length, r;
+    fd_set	*rfds;
 
-	rfds = calloc(howmany(fd + 1, NFDBITS), sizeof(fd_mask));
-	if (rfds == NULL)
-		err(1, "calloc");
+    rfds = calloc(howmany(fd + 1, NFDBITS), sizeof(fd_mask));
+    if (rfds == NULL)
+        err(1, "calloc");
 
-	FD_SET(fd, rfds);
+    FD_SET(fd, rfds);
 
 retry:
-	tv.tv_sec = 0;
-	tv.tv_usec = 1000000 * MAX_DELAY / MAX_QUERIES;
+    tv.tv_sec = 0;
+    tv.tv_usec = 1000000 * MAX_DELAY / MAX_QUERIES;
 
-	r = select(fd + 1, rfds, NULL, NULL, &tv);
+    r = select(fd + 1, rfds, NULL, NULL, &tv);
 
-	if (r < 0) {
-		if (errno == EINTR)
-			goto retry;
-		else
-			warn("select");
+    if (r < 0) {
+        if (errno == EINTR)
+            goto retry;
+        else
+            warn("select");
 
-		free(rfds);
-		return (r);
-	}
+        free(rfds);
+        return (r);
+    }
 
-	if (r != 1 || !FD_ISSET(fd, rfds)) {
-		free(rfds);
-		return (1);
-	}
+    if (r != 1 || !FD_ISSET(fd, rfds)) {
+        free(rfds);
+        return (1);
+    }
 
-	free(rfds);
+    free(rfds);
 
-	length = read(fd, receive, NTP_PACKET_MAX);
+    length = read(fd, receive, NTP_PACKET_MAX);
 
-	if (length < 0) {
-		warn("Unable to receive NTP packet from server");
-		return (-1);
-	}
+    if (length < 0) {
+        warn("Unable to receive NTP packet from server");
+        return (-1);
+    }
 
-	if (length < NTP_PACKET_MIN || length > NTP_PACKET_MAX) {
-		warnx("Invalid NTP packet size, packet rejected");
-		return (1);
-	}
+    if (length < NTP_PACKET_MIN || length > NTP_PACKET_MAX) {
+        warnx("Invalid NTP packet size, packet rejected");
+        return (1);
+    }
 
-	unpack_ntp(data, receive);
+    unpack_ntp(data, receive);
 
-	if (data->recvck != data->xmitck) {
-		warnx("Invalid cookie received, packet rejected");
-		return (1);
-	}
+    if (data->recvck != data->xmitck) {
+        warnx("Invalid cookie received, packet rejected");
+        return (1);
+    }
 
-	if (data->version < NTP_VERSION_MIN ||
-	    data->version > NTP_VERSION_MAX) {
-		warnx("Received NTP version %u, need %u or lower",
-		    data->version, NTP_VERSION);
-		return (1);
-	}
+    if (data->version < NTP_VERSION_MIN ||
+            data->version > NTP_VERSION_MAX) {
+        warnx("Received NTP version %u, need %u or lower",
+              data->version, NTP_VERSION);
+        return (1);
+    }
 
-	if (data->mode != NTP_MODE_SERVER) {
-		warnx("Invalid NTP server mode, packet rejected");
-		return (1);
-	}
+    if (data->mode != NTP_MODE_SERVER) {
+        warnx("Invalid NTP server mode, packet rejected");
+        return (1);
+    }
 
-	if (data->stratum > NTP_STRATUM_MAX) {
-		warnx("Invalid stratum received, packet rejected");
-		return (1);
-	}
+    if (data->stratum > NTP_STRATUM_MAX) {
+        warnx("Invalid stratum received, packet rejected");
+        return (1);
+    }
 
-	if (data->transmit == 0.0) {
-		warnx("Server clock invalid, packet rejected");
-		return (1);
-	}
+    if (data->transmit == 0.0) {
+        warnx("Server clock invalid, packet rejected");
+        return (1);
+    }
 
-	x = data->receive - data->originate;
-	y = data->transmit - data->current;
+    x = data->receive - data->originate;
+    y = data->transmit - data->current;
 
-	*off = (x + y) / 2;
-	*error = x - y;
+    *off = (x + y) / 2;
+    *error = x - y;
 
-	x = (data->current - data->originate) / 2;
+    x = (data->current - data->originate) / 2;
 
-	if (x > *error)
-		*error = x;
+    if (x > *error)
+        *error = x;
 
-	return (0);
+    return (0);
 }
 
 /*
@@ -421,28 +421,28 @@ retry:
 void
 unpack_ntp(struct ntp_data *data, u_char *packet)
 {
-	int i;
-	double d;
+    int i;
+    double d;
 
-	data->current = current_time(JAN_1970);
+    data->current = current_time(JAN_1970);
 
-	data->status = (packet[0] >> 6);
-	data->version = (packet[0] >> 3) & 0x07;
-	data->mode = packet[0] & 0x07;
-	data->stratum = packet[1];
+    data->status = (packet[0] >> 6);
+    data->version = (packet[0] >> 3) & 0x07;
+    data->mode = packet[0] & 0x07;
+    data->stratum = packet[1];
 
-	for (i = 0, d = 0.0; i < 8; ++i)
-	    d = 256.0*d+packet[NTP_RECEIVE+i];
+    for (i = 0, d = 0.0; i < 8; ++i)
+        d = 256.0*d+packet[NTP_RECEIVE+i];
 
-	data->receive = d / NTP_SCALE;
+    data->receive = d / NTP_SCALE;
 
-	for (i = 0, d = 0.0; i < 8; ++i)
-	    d = 256.0*d+packet[NTP_TRANSMIT+i];
+    for (i = 0, d = 0.0; i < 8; ++i)
+        d = 256.0*d+packet[NTP_TRANSMIT+i];
 
-	data->transmit = d / NTP_SCALE;
+    data->transmit = d / NTP_SCALE;
 
-	/* See write_packet for why this isn't an endian problem. */
-	memcpy(&data->recvck,packet+NTP_ORIGINATE,8);
+    /* See write_packet for why this isn't an endian problem. */
+    memcpy(&data->recvck,packet+NTP_ORIGINATE,8);
 }
 
 /*
@@ -452,22 +452,22 @@ unpack_ntp(struct ntp_data *data, u_char *packet)
 double
 current_time(double offset)
 {
-	struct timeval current;
-	u_int64_t t;
+    struct timeval current;
+    u_int64_t t;
 
-	if (gettimeofday(&current, NULL))
-		err(1, "Could not get local time of day");
+    if (gettimeofday(&current, NULL))
+        err(1, "Could not get local time of day");
 
-	/*
-	 * At this point, current has the current TAI time.
-	 * Now subtract leap seconds to set the posix tick.
-	 */
+    /*
+     * At this point, current has the current TAI time.
+     * Now subtract leap seconds to set the posix tick.
+     */
 
-	t = SEC_TO_TAI64(current.tv_sec);
-	if (corrleaps)
-		ntpleaps_sub(&t);
+    t = SEC_TO_TAI64(current.tv_sec);
+    if (corrleaps)
+        ntpleaps_sub(&t);
 
-	return (offset + TAI64_TO_SEC(t) + 1.0e-6 * current.tv_usec);
+    return (offset + TAI64_TO_SEC(t) + 1.0e-6 * current.tv_usec);
 }
 
 /*
@@ -477,43 +477,43 @@ current_time(double offset)
 void
 create_timeval(double difference, struct timeval *new, struct timeval *adjust)
 {
-	struct timeval old;
-	long n;
+    struct timeval old;
+    long n;
 
-	/* Start by converting to timeval format. Note that we have to
-	 * cater for negative, unsigned values. */
-	if ((n = (long) difference) > difference)
-		--n;
-	adjust->tv_sec = n;
-	adjust->tv_usec = (long) (MILLION_D * (difference-n));
-	errno = 0;
-	if (gettimeofday(&old, NULL))
-		err(1, "Could not get local time of day");
-	new->tv_sec = old.tv_sec + adjust->tv_sec;
-	new->tv_usec = (n = (long) old.tv_usec + (long) adjust->tv_usec);
+    /* Start by converting to timeval format. Note that we have to
+     * cater for negative, unsigned values. */
+    if ((n = (long) difference) > difference)
+        --n;
+    adjust->tv_sec = n;
+    adjust->tv_usec = (long) (MILLION_D * (difference-n));
+    errno = 0;
+    if (gettimeofday(&old, NULL))
+        err(1, "Could not get local time of day");
+    new->tv_sec = old.tv_sec + adjust->tv_sec;
+    new->tv_usec = (n = (long) old.tv_usec + (long) adjust->tv_usec);
 
-	if (n < 0) {
-		new->tv_usec += MILLION_L;
-		--new->tv_sec;
-	} else if (n >= MILLION_L) {
-		new->tv_usec -= MILLION_L;
-		++new->tv_sec;
-	}
+    if (n < 0) {
+        new->tv_usec += MILLION_L;
+        --new->tv_sec;
+    } else if (n >= MILLION_L) {
+        new->tv_usec -= MILLION_L;
+        ++new->tv_sec;
+    }
 }
 
 #ifdef DEBUG
 void
 print_packet(const struct ntp_data *data)
 {
-	printf("status:      %u\n", data->status);
-	printf("version:     %u\n", data->version);
-	printf("mode:        %u\n", data->mode);
-	printf("stratum:     %u\n", data->stratum);
-	printf("originate:   %f\n", data->originate);
-	printf("receive:     %f\n", data->receive);
-	printf("transmit:    %f\n", data->transmit);
-	printf("current:     %f\n", data->current);
-	printf("xmitck:      0x%0llX\n", data->xmitck);
-	printf("recvck:      0x%0llX\n", data->recvck);
+    printf("status:      %u\n", data->status);
+    printf("version:     %u\n", data->version);
+    printf("mode:        %u\n", data->mode);
+    printf("stratum:     %u\n", data->stratum);
+    printf("originate:   %f\n", data->originate);
+    printf("receive:     %f\n", data->receive);
+    printf("transmit:    %f\n", data->transmit);
+    printf("current:     %f\n", data->current);
+    printf("xmitck:      0x%0llX\n", data->xmitck);
+    printf("recvck:      0x%0llX\n", data->recvck);
 };
 #endif

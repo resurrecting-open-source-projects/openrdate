@@ -64,68 +64,68 @@
 
 void
 rfc868time_client (const char *hostname, int family, struct timeval *new,
-    struct timeval *adjust, int leapflag, int useudp, int port)
+                   struct timeval *adjust, int leapflag, int useudp, int port)
 {
-	struct addrinfo hints, *res0, *res;
-	struct timeval old;
-	u_int32_t tim;	/* RFC 868 states clearly this is an uint32 */
-	int s;
-	int error;
-	u_int64_t td;
+    struct addrinfo hints, *res0, *res;
+    struct timeval old;
+    u_int32_t tim;	/* RFC 868 states clearly this is an uint32 */
+    int s;
+    int error;
+    u_int64_t td;
 
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = family;
-	hints.ai_socktype = useudp ? SOCK_DGRAM : SOCK_STREAM;
-	/* XXX what about rfc868 UDP
-	 * probably not due to the Y2038 issue  -mirabile */
-	error = getaddrinfo(hostname, port ? NULL : "time", &hints, &res0);
-	if (error) {
-		errx(1, "%s: %s", hostname, gai_strerror(error));
-		/*NOTREACHED*/
-	}
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = family;
+    hints.ai_socktype = useudp ? SOCK_DGRAM : SOCK_STREAM;
+    /* XXX what about rfc868 UDP
+     * probably not due to the Y2038 issue  -mirabile */
+    error = getaddrinfo(hostname, port ? NULL : "time", &hints, &res0);
+    if (error) {
+        errx(1, "%s: %s", hostname, gai_strerror(error));
+        /*NOTREACHED*/
+    }
 
-	s = -1;
-	for (res = res0; res; res = res->ai_next) {
-		s = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-		if (s < 0)
-			continue;
+    s = -1;
+    for (res = res0; res; res = res->ai_next) {
+        s = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+        if (s < 0)
+            continue;
 
-		if (port) {
-			((struct sockaddr_in*)res->ai_addr)->sin_port = htons(port);
-		}
+        if (port) {
+            ((struct sockaddr_in*)res->ai_addr)->sin_port = htons(port);
+        }
 
-		if (connect(s, res->ai_addr, res->ai_addrlen) < 0) {
-			close(s);
-			s = -1;
-			continue;
-		}
+        if (connect(s, res->ai_addr, res->ai_addrlen) < 0) {
+            close(s);
+            s = -1;
+            continue;
+        }
 
-		break;
-	}
-	if (s < 0)
-		err(1, "Could not connect socket");
-	freeaddrinfo(res0);
+        break;
+    }
+    if (s < 0)
+        err(1, "Could not connect socket");
+    freeaddrinfo(res0);
 
-	/* UDP requires us to send an empty datagram first */
-	if (useudp)
-		send(s, NULL, 0, 0);
+    /* UDP requires us to send an empty datagram first */
+    if (useudp)
+        send(s, NULL, 0, 0);
 
-	if (read(s, &tim, sizeof(tim)) != sizeof(tim))
-		err(1, "Could not read data");
+    if (read(s, &tim, sizeof(tim)) != sizeof(tim))
+        err(1, "Could not read data");
 
-	(void) close(s);
-	tim = ntohl(tim) - DIFFERENCE;
+    (void) close(s);
+    tim = ntohl(tim) - DIFFERENCE;
 
-	if (gettimeofday(&old, NULL) == -1)
-		err(1, "Could not get local time of day");
+    if (gettimeofday(&old, NULL) == -1)
+        err(1, "Could not get local time of day");
 
-	td = SEC_TO_TAI64(old.tv_sec);
-	if (leapflag)
-		ntpleaps_sub(&td);
+    td = SEC_TO_TAI64(old.tv_sec);
+    if (leapflag)
+        ntpleaps_sub(&td);
 
-	adjust->tv_sec = tim - TAI64_TO_SEC(td);
-	adjust->tv_usec = 0;
+    adjust->tv_sec = tim - TAI64_TO_SEC(td);
+    adjust->tv_usec = 0;
 
-	new->tv_sec = old.tv_sec + adjust->tv_sec;
-	new->tv_usec = 0;
+    new->tv_sec = old.tv_sec + adjust->tv_sec;
+    new->tv_usec = 0;
 }
