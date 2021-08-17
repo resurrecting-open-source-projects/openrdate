@@ -1,3 +1,12 @@
+2021-08-17  Joao Eriberto Mota Filho <eriberto@eriberto.pro.br>
+Version 1.10.2
+
+    [ Joao Eriberto Mota Filho ]
+
+ * Ran astyle command to reorganize the source code.
+ * Updated install system, removed warnings and bumped required autoconf
+   to 2.69.
+
 2021-06-14  Joao Eriberto Mota Filho <eriberto@eriberto.pro.br>
 Version 1.10.1
 
