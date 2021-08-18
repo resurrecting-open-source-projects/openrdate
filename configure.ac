@@ -5,7 +5,7 @@
 # LICENSE file for the main source code (rdate.c).
 
 AC_PREREQ([2.69])
-AC_INIT([openrdate],[1.10.1],[https://github.com/resurrecting-open-source-projects/openrdate/issues])
+AC_INIT([openrdate],[1.10.2],[https://github.com/resurrecting-open-source-projects/openrdate/issues])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([src/rdate.c])
 AC_CONFIG_HEADERS([config.h])
