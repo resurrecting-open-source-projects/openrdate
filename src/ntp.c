@@ -73,7 +73,7 @@
 #define NTP_MODE_CLIENT       3		/* NTP client mode */
 #define NTP_MODE_SERVER       4		/* NTP server mode */
 #define NTP_VERSION           4		/* The current version */
-#define NTP_VERSION_MIN       1		/* The minum valid version */
+#define NTP_VERSION_MIN       1		/* The minimum valid version */
 #define NTP_VERSION_MAX       4		/* The maximum valid version */
 #define NTP_STRATUM_MAX      14		/* The maximum valid stratum */
 #define NTP_INSANITY     3600.0		/* Errors beyond this are hopeless */
