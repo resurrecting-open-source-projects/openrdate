@@ -11,6 +11,8 @@ AC_CONFIG_SRCDIR([src/rdate.c])
 AC_CONFIG_HEADERS([config.h])
 AC_ARG_VAR([kernel_version], [the version of the kernel to build against])
 
+AC_CANONICAL_HOST
+
 # Checks for programs.
 AC_PROG_CC
 
@@ -21,6 +23,8 @@ fi
 AC_PROG_INSTALL
 AC_PROG_RANLIB
 AC_PROG_EGREP
+
+AM_PROG_AR
 
 # Checks for libraries.
 AC_CHECK_LIB([c], [fork])
@@ -52,7 +56,6 @@ AC_CHECK_FUNCS([gettimeofday memset select socket])
 AC_PATH_PROG([UNAME], [uname],
                [:])
 
-AC_CANONICAL_HOST
 # Determine the particulars of the host
 case "${host}" in
 	*-*-linux*)
