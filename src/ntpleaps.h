@@ -46,11 +46,13 @@
 #ifndef _NTPLEAPS_H
 #define _NTPLEAPS_H
 
+#include <stdint.h>
+
 /* Offset between struct timeval.tv_sec and a tai64_t */
 #define	NTPLEAPS_OFFSET	(4611686018427387914ULL)
 
 /* Hide this ugly value from programmes */
-#define	SEC_TO_TAI64(s)	(NTPLEAPS_OFFSET + (u_int64_t)(s))
+#define	SEC_TO_TAI64(s)	(NTPLEAPS_OFFSET + (uint64_t)(s))
 #define	TAI64_TO_SEC(t)	((t) - NTPLEAPS_OFFSET)
 
 /* Initializes the leap second table. Does not need to be called
@@ -70,6 +72,6 @@ int ntpleaps_read(void);
  * to posix clock tick time.
  * returns 0 on success, -1 on error (time is unchanged), 1 on leap second
  */
-int ntpleaps_sub(u_int64_t *);
+int ntpleaps_sub(uint64_t *);
 
 #endif

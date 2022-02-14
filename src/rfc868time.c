@@ -50,6 +50,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <err.h>
+#include <stdint.h>
 #include <string.h>
 #include <netdb.h>
 #include <unistd.h>
@@ -68,10 +69,10 @@ rfc868time_client (const char *hostname, int family, struct timeval *new,
 {
     struct addrinfo hints, *res0, *res;
     struct timeval old;
-    u_int32_t tim;	/* RFC 868 states clearly this is an uint32 */
+    uint32_t tim;	/* RFC 868 states clearly this is an uint32 */
     int s;
     int error;
-    u_int64_t td;
+    uint64_t td;
 
     memset(&hints, 0, sizeof(hints));
     hints.ai_family = family;

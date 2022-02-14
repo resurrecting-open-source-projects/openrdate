@@ -45,12 +45,13 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 #include <unistd.h>
 
 #include "ntpleaps.h"
 
-static u_int64_t *leapsecs;
+static uint64_t *leapsecs;
 static unsigned int leapsecs_num;
 
 
@@ -81,10 +82,10 @@ ntpleaps_init(void)
 }
 
 int
-ntpleaps_sub(u_int64_t *t)
+ntpleaps_sub(uint64_t *t)
 {
     unsigned int i = 0;
-    u_int64_t u;
+    uint64_t u;
     int r = 1;
 
     if (ntpleaps_init() == -1)
@@ -105,10 +106,10 @@ ntpleaps_sub(u_int64_t *t)
     return (r);
 }
 
-u_int32_t
-read_be_dword(u_int8_t *ptr)
+uint32_t
+read_be_dword(uint8_t *ptr)
 {
-    u_int32_t res;
+    uint32_t res;
 
     memcpy(&res, ptr, 4);
     return (ntohl(res));
@@ -120,10 +121,10 @@ ntpleaps_read(void)
 {
     int fd;
     unsigned int r;
-    u_int8_t buf[32];
-    u_int32_t m1, m2, m3;
-    u_int64_t s;
-    u_int64_t *l;
+    uint8_t buf[32];
+    uint32_t m1, m2, m3;
+    uint64_t s;
+    uint64_t *l;
 
     fd = open("/usr/share/zoneinfo/right/UTC", O_RDONLY | O_NDELAY);
     if (fd == -1)
@@ -153,7 +154,7 @@ ntpleaps_read(void)
         close(fd);
         return (-1);
     }
-    if ((l = (u_int64_t *)malloc(r << 3)) == NULL) {
+    if ((l = (uint64_t *)malloc(r << 3)) == NULL) {
         close(fd);
         return (-1);
     }

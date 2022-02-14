@@ -52,6 +52,7 @@
 #include <netdb.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
@@ -106,11 +107,11 @@ struct ntp_data {
     double		receive;
     double		transmit;
     double		current;
-    u_int64_t	recvck;
+    uint64_t	recvck;
 
     /* Local State */
     double		originate;
-    u_int64_t	xmitck;
+    uint64_t	xmitck;
 };
 
 void	ntp_client(const char *, int, struct timeval *, struct timeval *, int, int, int);
@@ -282,7 +283,7 @@ write_packet(int fd, struct ntp_data *data)
 
     packet[0] = (NTP_VERSION << 3) | (NTP_MODE_CLIENT);
 
-    data->xmitck = (u_int64_t)arc4random() << 32 | arc4random();
+    data->xmitck = (uint64_t)arc4random() << 32 | arc4random();
 
     /*
      * Send out a random 64-bit number as our transmit time.  The NTP
@@ -300,7 +301,7 @@ write_packet(int fd, struct ntp_data *data)
      * the transmit field intelligible.
      */
 
-    *(u_int64_t *)(packet + NTP_TRANSMIT) = data->xmitck;
+    *(uint64_t *)(packet + NTP_TRANSMIT) = data->xmitck;
 
     data->originate = current_time(JAN_1970);
 
@@ -453,7 +454,7 @@ double
 current_time(double offset)
 {
     struct timeval current;
-    u_int64_t t;
+    uint64_t t;
 
     if (gettimeofday(&current, NULL))
         err(1, "Could not get local time of day");
