@@ -4,6 +4,7 @@
  * Copyright 2002      Thorsten Glaser.
  * Copyright 2005-2008 David Snyder <dasnyderx@yahoo.com>
  * Copyright 2019      Joao Eriberto Mota Filho <eriberto@eriberto.pro.br>
+ * Copyright 2022      Sam James <sam@gentoo.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

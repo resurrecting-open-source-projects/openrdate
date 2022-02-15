@@ -1,5 +1,6 @@
 # Copyright 2005-2008 David Snyder <dasnyderx(at)yahoo(dot)com>
 # Copyright 2019-2021 Joao Eriberto Mota Filho <eriberto@eriberto.pro.br>
+# Copyright 2022      Sam James <sam@gentoo.org>
 #
 # This file is under the same terms described by
 # LICENSE file for the main source code (rdate.c).

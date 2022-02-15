@@ -10,6 +10,7 @@
  * Copyright 2008      Jérémy Bobbio <lunar@debian.org>
  * Copyright 2009      Cyril Brulebois <kibi@debian.org>
  * Copyright 2009      Jakub Wilk <ubanus@users.sf.net>
+ * Copyright 2022      Sam James <sam@gentoo.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
