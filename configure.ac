@@ -1,12 +1,12 @@
 # Copyright 2005-2008 David Snyder <dasnyderx(at)yahoo(dot)com>
-# Copyright 2019-2021 Joao Eriberto Mota Filho <eriberto@eriberto.pro.br>
+# Copyright 2019-2022 Joao Eriberto Mota Filho <eriberto@eriberto.pro.br>
 # Copyright 2022      Sam James <sam@gentoo.org>
 #
 # This file is under the same terms described by
 # LICENSE file for the main source code (rdate.c).
 
 AC_PREREQ([2.69])
-AC_INIT([openrdate],[1.10.2],[https://github.com/resurrecting-open-source-projects/openrdate/issues])
+AC_INIT([openrdate],[1.11],[https://github.com/resurrecting-open-source-projects/openrdate/issues])
 AM_INIT_AUTOMAKE
 AC_CONFIG_SRCDIR([src/rdate.c])
 AC_CONFIG_HEADERS([config.h])
