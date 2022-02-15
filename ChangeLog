@@ -1,3 +1,20 @@
+2022-02-14  Joao Eriberto Mota Filho <eriberto@eriberto.pro.br>
+Version 1.11
+
+    [ Joao Eriberto Mota Filho ]
+
+ * Added a CI test for 'make dist'.
+ * Added autogen.sh, CONTRIBUTING.md and HISTORY to EXTRA_DIST in Makefile.am.
+ * Added rights for Sam James <sam@gentoo.org>.
+ * Changed autogen.sh and Makefile.am to remove ar-lib.
+
+    [ Sam James ]
+
+ * Respect AR from environment. This allows using different toolchains (e.g.
+   Clang and LLVM's tooling) and also facilitates cross-compilation.
+ * Using <stdint.h> to fix musl compatibility. This fixes building rdate on
+   e.g. musl rather than glibc.
+
 2021-08-17  Joao Eriberto Mota Filho <eriberto@eriberto.pro.br>
 Version 1.10.2
 
