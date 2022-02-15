@@ -9,7 +9,7 @@ SUBDIRS = src
 
 man_MANS= docs/rdate.8
 
-EXTRA_DIST= autogen.sh CONTRIBUTING.md docs/rdate.8 HISTORY
+EXTRA_DIST= autogen.sh CONTRIBUTING.md docs/rdate.8 HISTORY README.md
 
 distclean-local:
 	rm -rf autom4te.cache/

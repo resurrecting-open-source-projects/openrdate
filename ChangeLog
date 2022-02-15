@@ -4,7 +4,8 @@ Version 1.11
     [ Joao Eriberto Mota Filho ]
 
  * Added a CI test for 'make dist'.
- * Added autogen.sh, CONTRIBUTING.md and HISTORY to EXTRA_DIST in Makefile.am.
+ * Added autogen.sh, CONTRIBUTING.md, HISTORY and README.md to EXTRA_DIST in
+   Makefile.am.
  * Added rights for Sam James <sam@gentoo.org>.
  * Changed autogen.sh and Makefile.am to remove ar-lib.
 
