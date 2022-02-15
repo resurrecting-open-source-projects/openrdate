@@ -37,12 +37,14 @@ jobs:
            mkdir test_dist
            mv openrdate-*.tar.gz test_dist
            cd test_dist
+           pwd
            tar -xvf openrdate-*.tar.gz
            rm -f openrdate-*.tar.gz
            cd openrdate-*
            ./autogen.sh
            ./configure
            make
+           ls
            sudo make install
            sudo make uninstall
            make distclean
