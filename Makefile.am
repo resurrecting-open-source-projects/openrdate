@@ -14,6 +14,7 @@ EXTRA_DIST= docs/rdate.8
 distclean-local:
 	rm -rf autom4te.cache/
 	rm -f aclocal.m4 \
+              ar-lib \
               compile \
               config.* \
               configure \
