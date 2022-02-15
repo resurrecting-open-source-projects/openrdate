@@ -1,7 +1,7 @@
 #!/bin/sh
 
-# autogen.sh with clean option, v0.1-rdate
-# Copyright 2019 Joao Eriberto Mota Filho <eriberto@eriberto.pro.br>
+# autogen.sh with clean option, v0.2-rdate
+# Copyright 2019-2022 Joao Eriberto Mota Filho <eriberto@eriberto.pro.br>
 #
 # This file is under BSD-3-Clause license.
 #
