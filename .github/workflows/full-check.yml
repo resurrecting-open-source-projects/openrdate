@@ -29,3 +29,20 @@ jobs:
       run: |
            rdate 2>&1 | grep Usage
            rdate -pn4v ntp.on.br
+    - name: test_make_dist
+      run: |
+           ./autogen.sh
+           ./configure
+           make dist
+           mkdir test_dist
+           mv openrdate-*.tar.gz test_dist
+           cd test_dist
+           tar -xvf openrdate-*.tar.gz
+           rm -f openrdate-*.tar.gz
+           cd openrdate-*
+           ./autogen.sh
+           ./configure
+           make
+           sudo make install
+           sudo make uninstall
+           make distclean
