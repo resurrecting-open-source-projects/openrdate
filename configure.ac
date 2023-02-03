@@ -36,8 +36,6 @@ AC_CHECK_LIB([util], [malloc])
 AC_CHECK_HEADERS([arpa/inet.h fcntl.h float.h limits.h netdb.h \
                   netinet/in.h stdlib.h string.h sys/param.h sys/socket.h \
                   sys/time.h unistd.h util.h])
-AC_CHECK_HEADERS([bsd/stdlib.h], [], \
-                  [echo "ERROR: previous header not found."; exit -1])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -51,7 +49,7 @@ AC_STRUCT_TM
 AC_FUNC_MALLOC
 AC_FUNC_SELECT_ARGTYPES
 AC_FUNC_STRFTIME
-AC_CHECK_FUNCS([gettimeofday memset select socket])
+AC_CHECK_FUNCS([arc4random gettimeofday memset select socket])
 
 # Check for uname prog
 AC_PATH_PROG([UNAME], [uname],

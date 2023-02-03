@@ -9,7 +9,7 @@ bin_PROGRAMS = rdate
 
 rdate_SOURCES = rdate.c
 
-rdate_LDADD = librdate.a -lbsd
+rdate_LDADD = librdate.a
 
 noinst_LIBRARIES = librdate.a
 

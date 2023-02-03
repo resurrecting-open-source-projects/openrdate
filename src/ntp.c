@@ -59,7 +59,6 @@
 #include <unistd.h>
 
 #include "ntpleaps.h"
-#include <bsd/stdlib.h>
 
 /*
  * NTP definitions.  Note that these assume 8-bit bytes - sigh.  There
@@ -101,10 +100,10 @@
 #define MILLION_D       1.0e6		/* Must be equal to MILLION_L */
 
 struct ntp_data {
-    u_char		status;
-    u_char		version;
-    u_char		mode;
-    u_char		stratum;
+    uint8_t		status;
+    uint8_t		version;
+    uint8_t		mode;
+    uint8_t		stratum;
     double		receive;
     double		transmit;
     double		current;
@@ -119,7 +118,7 @@ void	ntp_client(const char *, int, struct timeval *, struct timeval *, int, int,
 int	sync_ntp(int, const struct sockaddr *, socklen_t, double *, double *, int);
 int	write_packet(int, struct ntp_data *);
 int	read_packet(int, struct ntp_data *, double *, double *);
-void	unpack_ntp(struct ntp_data *, u_char *);
+void	unpack_ntp(struct ntp_data *, uint8_t *);
 double	current_time(double);
 void	create_timeval(double, struct timeval *, struct timeval *);
 
@@ -277,14 +276,20 @@ sync_ntp(int fd, const struct sockaddr *peer, socklen_t addrlen,
 int
 write_packet(int fd, struct ntp_data *data)
 {
-    u_char	packet[NTP_PACKET_MIN];
+    uint8_t	packet[NTP_PACKET_MIN];
     ssize_t	length;
 
     memset(packet, 0, sizeof(packet));
 
     packet[0] = (NTP_VERSION << 3) | (NTP_MODE_CLIENT);
 
+#ifndef HAVE_ARC4RANDOM
+    uint64_t tmp;
+    getentropy(&tmp, 8);
+    data->xmitck = tmp;
+#else
     data->xmitck = (uint64_t)arc4random() << 32 | arc4random();
+#endif
 
     /*
      * Send out a random 64-bit number as our transmit time.  The NTP
@@ -325,7 +330,7 @@ write_packet(int fd, struct ntp_data *data)
 int
 read_packet(int fd, struct ntp_data *data, double *off, double *error)
 {
-    u_char	receive[NTP_PACKET_MAX];
+    uint8_t	receive[NTP_PACKET_MAX];
     struct	timeval tv;
     double	x, y;
     int	length, r;
@@ -421,7 +426,7 @@ retry:
  * to SNTP.
  */
 void
-unpack_ntp(struct ntp_data *data, u_char *packet)
+unpack_ntp(struct ntp_data *data, uint8_t *packet)
 {
     int i;
     double d;
